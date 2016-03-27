@@ -4,10 +4,10 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
-%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL VOID
+%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR FLOAT
+%token RETURN IF ELSE FOR WHILE INT BOOL VOID CHAR
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -37,25 +37,38 @@ decls:
  | decls fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-     { { typ = $1;
-	 fname = $2;
-	 formals = $4;
-	 locals = List.rev $7;
-	 body = List.rev $8 } }
+   LBRACE param_types_list COLON typ RBRACE ID ASSIGN param_ids_list LSBRACE vdecl_list stmt_list RSBRACE
+     { { typ = $4;
+	 fname = $6;
 
-formals_opt:
+   formals = List.combine $2 $8;
+	 locals = List.rev $10;
+	 body = List.rev $11 } }
+
+param_types_list:
     /* nothing */ { [] }
-  | formal_list   { List.rev $1 }
+  | param_types_list_r   { List.rev $1 }
 
-formal_list:
-    typ ID                   { [($1,$2)] }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+param_types_list_r:
+    typ                   { [($1)] }
+  | param_types_list_r typ { ($2) :: $1 }
+
+param_ids_list:
+    /* nothing */ { [] }
+  | param_ids_list_r   { List.rev $1 }
+
+param_ids_list_r:
+    ID                   { [($1)] }
+  | param_ids_list_r ID { ($2) :: $1 }
+
+/* need to combine the lists */
 
 typ:
     INT { Int }
   | BOOL { Bool }
   | VOID { Void }
+  | FLOAT { Float }
+  | CHAR { Char }
 
 vdecl_list:
     /* nothing */    { [] }
