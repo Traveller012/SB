@@ -41,7 +41,7 @@ type program = bind list * func_decl list
 (* Pretty-printing functions *)
 
 let string_of_op = function
-    Add -> "+"
+  | Add -> "+"
   | Sub -> "-"
   | Mult -> "*"
   | Div -> "/"
@@ -55,7 +55,7 @@ let string_of_op = function
   | Or -> "||"
 
 let string_of_uop = function
-    Neg -> "-"
+  | Neg -> "-"
   | Not -> "!"
 
 let rec string_of_expr = function
