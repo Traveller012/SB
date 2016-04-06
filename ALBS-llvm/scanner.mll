@@ -5,9 +5,10 @@
     	Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun x -> x)
 }
 
-let escape = '\\' ['\\' ''' '"' 'n' 'r' 't']
+let escaped_char = '\\' ['\\' ''' '"' 'n' 'r' 't']
 let ascii = ([' '-'!' '#'-'[' ']'-'~'])
-let string = '"' ( (ascii | escape)* as s) '"'
+let string = '"' ( (ascii | escaped_char)* as s) '"'
+let escape_single_char = ''' (escaped_char) '''
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
