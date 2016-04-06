@@ -86,10 +86,32 @@ let translate (globals, functions) =
       | A.Noexpr -> L.const_int i32_t 0
       | A.Call(fname, el)    -> (function
         "print" -> 
+         let type_print el = (
+          match List.hd el with
+          | A.String_Lit s -> 
+            let s = expr builder (List.hd el) in
+            let zero = L.const_int i32_t 0 in
+            let s = L.build_in_bounds_gep s [| zero |] "" builder in
+            L.build_call printf_func [| s |] "" builder
+          | A.Literal i ->
+            let s = expr builder (List.hd el) in
+            let zero = L.const_int i32_t 0 in
+            let s = L.build_in_bounds_gep s [| zero |] "" builder in
+            L.build_call printf_func [| s |] "" builder
+          | _ ->
+            let s = expr builder (List.hd el) in
+            let zero = L.const_int i32_t 0 in
+            let s = L.build_in_bounds_gep s [| zero |] "" builder in
+            L.build_call printf_func [| s |] "" builder)
+        in type_print el
+
+
+
+        (*
           let s = expr builder (List.hd el) in
           let zero = L.const_int i32_t 0 in
           let s = L.build_in_bounds_gep s [| zero |] "" builder in
-          L.build_call printf_func [| s |] "" builder
+          L.build_call printf_func [| s |] "" builder*)
         | _       -> L.build_global_stringptr "_ case \n" "" builder) fname
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
