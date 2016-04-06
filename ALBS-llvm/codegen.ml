@@ -100,14 +100,6 @@ let translate (globals, functions) =
             let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
             L.build_call printf_func [| llvm_val |] "" builder)
         in type_print el
-
-
-
-        (*
-          let s = expr builder (List.hd el) in
-          let zero = L.const_int i32_t 0 in
-          let s = L.build_in_bounds_gep s [| zero |] "" builder in
-          L.build_call printf_func [| s |] "" builder*)
         | _       -> L.build_global_stringptr "_ case \n" "" builder) fname
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
@@ -137,11 +129,7 @@ let translate (globals, functions) =
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
     L.build_call printf_func [| int_format_str ; (expr builder e) |]
       "printf" builder
-      | A.Call (f, act) ->
-        let (fdef, fdecl) = StringMap.find f function_decls in
-        let actuals = List.rev (List.map (expr builder) (List.rev act)) in
-        let result = (match fdecl.A.typ with A.Void -> "" | _ -> f ^ "_result") in
-         L.build_call fdef (Array.of_list actuals) result builder in
+    in
     (* Invoke "f builder" if the current block doesn't already
        have a terminal (e.g., a branch). *)
     let add_terminal builder f =
