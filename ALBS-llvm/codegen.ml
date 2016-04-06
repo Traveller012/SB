@@ -10,6 +10,7 @@ http://llvm.moe/ocaml/
 module L = Llvm
 module A = Ast
 
+
 module StringMap = Map.Make(String)
 
 let translate (globals, functions) =
@@ -89,17 +90,15 @@ let translate (globals, functions) =
          let type_print el = (
           match List.hd el with
           | A.String_Lit s -> 
-            let s = expr builder (List.hd el) in
-            let zero = L.const_int i32_t 0 in
-            let s = L.build_in_bounds_gep s [| zero |] "" builder in
-            L.build_call printf_func [| s |] "" builder
+            let head = expr builder (List.hd el) in
+            let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
+            L.build_call printf_func [| llvm_val |] "" builder
           | A.Literal i ->
             L.build_call printf_func [| int_format_str ; (expr builder (List.hd el)) |] "" builder
           | _ ->
-            let s = expr builder (List.hd el) in
-            let zero = L.const_int i32_t 0 in
-            let s = L.build_in_bounds_gep s [| zero |] "" builder in
-            L.build_call printf_func [| s |] "" builder)
+            let head = expr builder (List.hd el) in
+            let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
+            L.build_call printf_func [| llvm_val |] "" builder)
         in type_print el
 
 
