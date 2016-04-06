@@ -85,9 +85,19 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
-	A.Literal i -> L.const_int i32_t i
+      | A.String_Lit s        -> L.build_global_stringptr s "" builder
+	    | A.Literal i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
+      | A.Call(fname, el)    -> (function
+        "print" -> 
+          let printf_ty = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+          let printf = L.declare_function "printf" printf_ty the_module in
+          let s = expr builder (List.hd el) in
+          let zero = L.const_int i32_t 0 in
+          let s = L.build_in_bounds_gep s [| zero |] "" builder in
+          L.build_call printf [| s |] "" builder
+        | _       -> L.build_global_stringptr "Hi" "" builder) fname
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1

@@ -1,0 +1,6 @@
+-n test-hello...
+FAILED
+  test-hello.out differs
+-n fail-*...
+FAILED
+  fail-*.err differs

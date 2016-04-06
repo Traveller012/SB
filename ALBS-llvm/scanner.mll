@@ -1,6 +1,13 @@
 (* Ocamllex scanner for MicroC *)
 
-{ open Parser }
+{ open Parser 
+    let unescape s =
+    	Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun x -> x)
+}
+
+let escape = '\\' ['\\' ''' '"' 'n' 'r' 't']
+let ascii = ([' '-'!' '#'-'[' ']'-'~'])
+let string = '"' ( (ascii | escape)* as s) '"'
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
@@ -42,7 +49,7 @@ rule token = parse
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
-
+| string       		{ STRING_LITERAL(unescape s) }
 and comment = parse
   "*/" { token lexbuf }
 | _    { comment lexbuf }

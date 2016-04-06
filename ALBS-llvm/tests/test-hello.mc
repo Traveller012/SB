@@ -1,3 +1,3 @@
 { : int} main = [
-  print(17);
+  print("Hello World");
 ]

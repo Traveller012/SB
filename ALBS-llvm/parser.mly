@@ -2,6 +2,8 @@
 
 %{
 open Ast
+  let unescape s =
+      Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun x -> x)
 %}
 
 %token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON
@@ -9,6 +11,7 @@ open Ast
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR FLOAT
 %token RETURN IF ELSE FOR WHILE INT BOOL VOID CHAR
 %token <int> LITERAL
+%token <string> STRING_LITERAL
 %token <string> ID
 %token EOF
 
@@ -97,7 +100,8 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    LITERAL          { Literal($1) }
+  | STRING_LITERAL      { String_Lit(unescape $1) }  
+  | LITERAL          { Literal($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }

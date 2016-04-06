@@ -88,6 +88,7 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.out" &&
     Run "$MICROC" "<" $1 ">" "${basename}.ll" &&
     Run "$LLI" "${basename}.ll" ">" "${basename}.out" &&
+    Run "cat" "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
     # Report the status and clean up the generated files
