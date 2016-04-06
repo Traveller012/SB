@@ -15,7 +15,7 @@ module StringMap = Map.Make(String)
 
 let translate (globals, functions) =
   let context = L.global_context () in
-  let the_module = L.create_module context "MicroC"
+  let the_module = L.create_module context "ALBS"
   and i32_t  = L.i32_type  context
   and f32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context
