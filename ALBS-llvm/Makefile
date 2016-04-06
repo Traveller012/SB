@@ -4,26 +4,26 @@
 
 # Easiest way to build: using ocamlbuild, which in turn uses ocamlfind
 
-.PHONY : microc.native
+.PHONY : albs.native
 
-microc.native :
+albs.native :
 	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
-		microc.native
+		albs.native
 
 # "make clean" removes all generated files
 
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log *.diff microc scanner.ml parser.ml parser.mli
+	rm -rf testall.log *.diff albs scanner.ml parser.ml parser.mli
 	rm -rf *.cmx *.cmi *.cmo *.cmx *.o
 
 # More detailed: build using ocamlc/ocamlopt + ocamlfind to locate LLVM
 
-OBJS = ast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx microc.cmx
+OBJS = ast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx albs.cmx
 
-microc : $(OBJS)
-	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o microc
+albs : $(OBJS)
+	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o albs
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
@@ -45,8 +45,8 @@ ast.cmo :
 ast.cmx :
 codegen.cmo : ast.cmo
 codegen.cmx : ast.cmx
-microc.cmo : semant.cmo scanner.cmo parser.cmi codegen.cmo ast.cmo
-microc.cmx : semant.cmx scanner.cmx parser.cmx codegen.cmx ast.cmx
+albs.cmo : semant.cmo scanner.cmo parser.cmi codegen.cmo ast.cmo
+albs.cmx : semant.cmx scanner.cmx parser.cmx codegen.cmx ast.cmx
 parser.cmo : ast.cmo parser.cmi
 parser.cmx : ast.cmx parser.cmi
 scanner.cmo : parser.cmi
@@ -67,12 +67,12 @@ FAILS = assign1 assign2 assign3 dead1 dead2 expr1 expr2 for1 for2	\
     func9 global1 global2 if1 if2 if3 nomain return1 return2 while1	\
     while2
 
-TESTFILES = $(TESTS:%=test-%.mc) $(TESTS:%=test-%.out) \
-	    $(FAILS:%=fail-%.mc) $(FAILS:%=fail-%.err)
+TESTFILES = $(TESTS:%=test-%.sb) $(TESTS:%=test-%.out) \
+	    $(FAILS:%=fail-%.sb) $(FAILS:%=fail-%.err)
 
-TARFILES = ast.ml codegen.ml Makefile microc.ml parser.mly README scanner.mll \
+TARFILES = ast.ml codegen.ml Makefile albs.ml parser.mly README scanner.mll \
 	semant.ml testall.sh $(TESTFILES:%=tests/%)
 
-microc-llvm.tar.gz : $(TARFILES)
-	cd .. && tar czf microc-llvm/microc-llvm.tar.gz \
-		$(TARFILES:%=microc-llvm/%)
+albs-llvm.tar.gz : $(TARFILES)
+	cd .. && tar czf albs-llvm/albs-llvm.tar.gz \
+		$(TARFILES:%=albs-llvm/%)

@@ -9,10 +9,10 @@
 LLI="lli"
 #LLI="/usr/local/opt/llvm/bin/lli"
 
-# Path to the microc compiler.  Usually "./microc.native"
-# Try "_build/microc.native" if ocamlbuild was unable to create a symbolic link.
-MICROC="./microc.native"
-#MICROC="_build/microc.native"
+# Path to the albs compiler.  Usually "./albs.native"
+# Try "_build/albs.native" if ocamlbuild was unable to create a symbolic link.
+ALBS="./albs.native"
+#ALBS="_build/albs.native"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -25,7 +25,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.mc files]"
+    echo "Usage: testall.sh [options] [.sb files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -74,8 +74,8 @@ RunFail() {
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.sb//'`
+    reffile=`echo $1 | sed 's/.sb$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -86,7 +86,7 @@ Check() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.out" &&
-    Run "$MICROC" "<" $1 ">" "${basename}.ll" &&
+    Run "$ALBS" "<" $1 ">" "${basename}.ll" &&
     Run "$LLI" "${basename}.ll" ">" "${basename}.out" &&
     Run "cat" "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
@@ -108,8 +108,8 @@ Check() {
 CheckFail() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.sb//'`
+    reffile=`echo $1 | sed 's/.sb$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -120,7 +120,11 @@ CheckFail() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-    RunFail "$MICROC" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
+    RunFail "$ALBS" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
+    # "echo was:" &&
+    # "cat" "${basename}.err" &&
+    # "echo should be:" &&
+    # "cat" "${reffile}.err" &&
     Compare ${basename}.err ${reffile}.err ${basename}.diff
 
     # Report the status and clean up the generated files
@@ -163,7 +167,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.mc tests/fail-*.mc"
+    files="tests/test-*.sb tests/fail-*.sb"
 fi
 
 for file in $files
