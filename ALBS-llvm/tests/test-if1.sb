@@ -1,3 +1,4 @@
 { : int} main = [
   if (true) print(2);
+  rtn 0;
 ]

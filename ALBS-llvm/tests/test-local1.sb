@@ -8,5 +8,5 @@
 
 { : int} main = [
   foo(true);
-  return 0;
+  rtn 0;
 ]

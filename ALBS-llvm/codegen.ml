@@ -94,10 +94,7 @@ let translate (globals, functions) =
             let s = L.build_in_bounds_gep s [| zero |] "" builder in
             L.build_call printf_func [| s |] "" builder
           | A.Literal i ->
-            let s = expr builder (List.hd el) in
-            let zero = L.const_int i32_t 0 in
-            let s = L.build_in_bounds_gep s [| zero |] "" builder in
-            L.build_call printf_func [| s |] "" builder
+            L.build_call printf_func [| int_format_str ; (expr builder (List.hd el)) |] "" builder
           | _ ->
             let s = expr builder (List.hd el) in
             let zero = L.const_int i32_t 0 in

@@ -1,3 +1,4 @@
 { : int} main = [
   print("Hello World!\n");
+  rtn 0;
 ]

@@ -13,4 +13,5 @@
   printb(!true);
   print(-10);
   print(--42);
+  rtn 0;
 ]

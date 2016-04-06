@@ -5,11 +5,11 @@ int cond(bool b)
     x = 42;
   else
     x = 17;
-  return x;
+  rtn x;
 ]
 
 { : int} main = [
  print(cond(true));
  print(cond(false));
- return 0;
+ rtn 0;
 ]

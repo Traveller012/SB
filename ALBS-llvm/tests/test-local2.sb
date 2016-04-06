@@ -5,10 +5,10 @@
 
   c = a;
 
-  return c + 10;
+  rtn c + 10;
 ]
 
 { : int} main = [
  print(foo(37, false));
- return 0;
+ rtn 0;
 ]
