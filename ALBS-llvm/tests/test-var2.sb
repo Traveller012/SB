@@ -1,9 +1,8 @@
 int a;
 
-void foo(int c)
-{
+{int : void} foo = c[
   a = c + 42;
-}
+]
 
 { : int} main = [
   foo(73);

@@ -23,5 +23,6 @@
   printb(1 >= 2);
   printb(1 >= 1);
   printb(2 >= 1); 
+  
   rtn 0;
 ]
