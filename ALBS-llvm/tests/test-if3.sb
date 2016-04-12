@@ -1,5 +1,8 @@
 { : int} main = [
+
   if (false) print(42);
+
   print(17);
+
   rtn 0;
 ]

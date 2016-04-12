@@ -1,9 +1,11 @@
-{bool :} foo = i
+{bln : void} foo = i
 [
-  int i; /* Should hide the formal i */
+  int i; 
 
   i = 42;
+ 
   print(i + i);
+  
 ]
 
 { : int} main = [

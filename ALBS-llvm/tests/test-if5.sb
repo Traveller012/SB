@@ -1,15 +1,17 @@
-int cond(bool b)
-[
-  int x;
-  if (b)
-    x = 42;
-  else
-    x = 17;
-  rtn x;
-]
-
 { : int} main = [
  print(cond(true));
  print(cond(false));
  rtn 0;
+]
+
+{bln : int} cond = blaahhhh [
+
+  int x;
+
+  if (blaahhhh)
+    x = 42;
+  else
+    x = 17;
+
+  rtn x;
 ]

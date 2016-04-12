@@ -85,22 +85,31 @@ let translate (globals, functions) =
       | A.Literal i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
-      | A.Call(fname, el)    -> (function
-        "print" -> 
-         let type_print el = (
-          match List.hd el with
-          | A.String_Lit s -> 
-            let head = expr builder (List.hd el) in
-            let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
-            L.build_call printf_func [| llvm_val |] "" builder
-          | A.Literal i ->
-            L.build_call printf_func [| int_format_str ; (expr builder (List.hd el)) |] "" builder
-          | _ ->
-            let head = expr builder (List.hd el) in
-            let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
-            L.build_call printf_func [| llvm_val |] "" builder)
-        in type_print el
-        | _       -> L.build_global_stringptr "_ case \n" "" builder) fname
+
+      (*integer literals*)
+      | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
+
+        (match List.hd [e] with 
+
+        | A.String_Lit s -> 
+              let head = expr builder (List.hd [e]) in
+              let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
+              L.build_call printf_func [| llvm_val |] "" builder
+
+        | _ -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
+
+                  
+        )
+
+      (*printing functions*)
+      | A.Call (f, act) ->
+         let (fdef, fdecl) = StringMap.find f function_decls in
+
+        let actuals = List.rev (List.map (expr builder) (List.rev act)) in
+        let result = (match fdecl.A.typ with A.Void -> ""
+                                            | _ -> f ^ "_result") in
+         L.build_call fdef (Array.of_list actuals) result builder
+
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
     let e1' = expr builder e1
@@ -126,9 +135,10 @@ let translate (globals, functions) =
       | A.Not     -> L.build_not) e' "tmp" builder
       | A.Assign (s, e) -> let e' = expr builder e in
         ignore (L.build_store e' (lookup s) builder); e'
-      | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
-    L.build_call printf_func [| int_format_str ; (expr builder e) |]
-      "printf" builder
+  
+  
+
+
     in
     (* Invoke "f builder" if the current block doesn't already
        have a terminal (e.g., a branch). *)

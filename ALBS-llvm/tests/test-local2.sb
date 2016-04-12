@@ -1,14 +1,18 @@
-{int int : int} foo = a b
+{int bln : int} foo = a b
 [
   int c;
-  bool d;
+ 
+  bln d;
 
   c = a;
-
+  
   rtn c + 10;
 ]
 
 { : int} main = [
+
  print(foo(37, false));
+
  rtn 0;
+
 ]
