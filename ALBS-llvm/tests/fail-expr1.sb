@@ -1,17 +1,17 @@
 int a;
-bool b;
+bln b;
 
-{int, bool : } foo = c d
+{int bln : void} foo = c d
 [
   int dd;
-  bool e;
+  bln e;
   a + c;
   c - a;
   a * 3;
   c / 2;
-  d + a; /* Error: bool + int */
+  d + a; /* Error: bln + int */
 ]
 
 { : int} main = [
-  return 0;
+  rtn 0;
 ]

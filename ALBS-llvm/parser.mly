@@ -2,8 +2,10 @@
 
 %{
 open Ast
-  let unescape s =
-      Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun x -> x)
+
+let unescape s =
+  Scanf.sscanf ("\"" ^ s ^ "\"") "%S%!" (fun x -> x)
+
 %}
 
 %token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON
@@ -43,7 +45,6 @@ fdecl:
    LBRACE param_types_list COLON typ RBRACE ID ASSIGN param_ids_list LSBRACE vdecl_list stmt_list RSBRACE
      { { typ = $4;
 	 fname = $6;
-
    formals = List.combine $2 $8;
 	 locals = List.rev $10;
 	 body = List.rev $11 } }
@@ -64,14 +65,11 @@ param_ids_list_r:
     ID                   { [($1)] }
   | param_ids_list_r ID { ($2) :: $1 }
 
-/* need to combine the lists */
-
 typ:
     INT { Int }
   | BOOL { Bool }
   | VOID { Void }
   | FLOAT { Float }
-  | CHAR { Char }
 
 vdecl_list:
     /* nothing */    { [] }

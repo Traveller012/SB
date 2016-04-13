@@ -3,7 +3,8 @@
 
   {
     i = 15;
-    return i;
+    rtn i;
   }
+
   i = 32; /* Error: code after a return */
 ]
