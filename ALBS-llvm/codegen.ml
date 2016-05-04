@@ -17,7 +17,7 @@ let translate (globals, functions) =
   let context = L.global_context () in
   let the_module = L.create_module context "ALBS"
   and i32_t  = L.i32_type  context
-  and f32_t  = L.i32_type  context
+  and f_t   = L.double_type   context
   and i8_t   = L.i8_type   context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
@@ -26,7 +26,7 @@ let translate (globals, functions) =
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.Char -> i32_t
-    | A.Float -> f32_t
+    | A.Float -> f_t
     | A.Void -> void_t in
 
   (* Declare each global variable; remember its value in a map *)
@@ -54,7 +54,7 @@ let translate (globals, functions) =
   let build_function_body fdecl =
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
-
+    let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
 
     (* Construct the function's "locals": formal arguments and locally
@@ -81,6 +81,7 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
+      | A.FloatLit f -> L.const_float f_t f
       | A.String_Lit s        -> L.build_global_stringptr s "" builder
       | A.Literal i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
@@ -89,16 +90,26 @@ let translate (globals, functions) =
       (*integer literals*)
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
 
-        (match List.hd [e] with 
+        (match List.hd [e] with
 
-        | A.String_Lit s -> 
+        | A.String_Lit s ->
               let head = expr builder (List.hd [e]) in
-              let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "" builder in
-              L.build_call printf_func [| llvm_val |] "" builder
+              let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "string_printf" builder in
 
-        | _ -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
+              L.build_call printf_func [| llvm_val |] "string_printf" builder
 
-                  
+        (* | A.FloatLit f ->
+              let s = expr builder (A.FloatLit f) in
+
+              let llvm_val = L.build_in_bounds_gep s [| L.const_int i32_t 0 |] "" builder in
+              L.build_call printf_func [| llvm_val |] "float_printf" builder *)
+
+        | A.FloatLit f -> L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
+
+        | A.Literal i -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+
+        | _ -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+
         )
 
       (*printing functions*)
@@ -135,8 +146,8 @@ let translate (globals, functions) =
       | A.Not     -> L.build_not) e' "tmp" builder
       | A.Assign (s, e) -> let e' = expr builder e in
         ignore (L.build_store e' (lookup s) builder); e'
-  
-  
+
+
 
 
     in
