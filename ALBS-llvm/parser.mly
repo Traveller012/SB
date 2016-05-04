@@ -77,7 +77,22 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   typ ID SEMI { ($1, $2) }
+  datatype ID SEMI { ($1, $2) }
+
+array_type:
+  typ LSBRACE brackets RSBRACE { Arraytype($1, $3) }
+
+
+datatype:
+    | typ   { $1 }
+
+/*datatype:
+  | typ   { Datatype($1) }
+  | array_type { $1 }*/
+
+brackets:
+	|	/* nothing */ 			   { 1 }
+	| 	brackets RSBRACE LSBRACE { $1 + 1 }
 
 stmt_list:
     /* nothing */  { [] }

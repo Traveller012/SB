@@ -7,6 +7,8 @@ type uop = Neg | Not
 
 type typ = Int | Bool | Void | Float | Char
 
+type datatype = Arraytype of typ * int | Datatype of typ | Any
+
 type bind = typ * string
 
 type expr =
@@ -88,7 +90,7 @@ let rec string_of_stmt = function
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
 let string_of_typ = function
-    Int -> "int"
+  |  Int -> "int"
   | Bool -> "bln"
   | Void -> "void"
   | Float -> "flt"
