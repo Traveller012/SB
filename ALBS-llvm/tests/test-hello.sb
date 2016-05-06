@@ -1,10 +1,16 @@
 { : int} main = [
-  flt f;
+
   int x;
-  x = 4;
-  print(x);
-  f = 17.4;
-  print(5.1);
-  print("Hello World!\n");
+    flt f;
+    x = 4;
+
+  f = 4.1;
+
+
+    print(f);
+    print(5);
+
+  /*f = 17.4;
+  print(5.1);*/
   rtn 0;
 ]

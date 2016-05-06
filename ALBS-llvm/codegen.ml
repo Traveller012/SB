@@ -88,7 +88,7 @@ let translate (globals, functions) =
       | A.Noexpr -> L.const_int i32_t 0
 
       (*integer literals*)
-      | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
+      | A.Call ("print", [e]) ->
 
         (match List.hd [e] with
 
@@ -96,6 +96,7 @@ let translate (globals, functions) =
               let head = expr builder (List.hd [e]) in
               let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "string_printf" builder in
 
+              print_endline ";a.string print called";
               L.build_call printf_func [| llvm_val |] "string_printf" builder
 
         (* | A.FloatLit f ->
@@ -104,11 +105,11 @@ let translate (globals, functions) =
               let llvm_val = L.build_in_bounds_gep s [| L.const_int i32_t 0 |] "" builder in
               L.build_call printf_func [| llvm_val |] "float_printf" builder *)
 
-        | A.FloatLit f -> L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
+        | A.FloatLit f -> print_endline ";a.floatlit print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
-        | A.Literal i -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+        | A.Id i -> print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
-        | _ -> L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+        | _ -> print_endline ";_ print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
 
         )
 

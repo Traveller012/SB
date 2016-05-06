@@ -1,0 +1,134 @@
+/usr/bin/lli
+
+###### Testing test-hello
+./albs.native < tests/test-hello.sb > test-hello.ll
+lli test-hello.ll > test-hello.out
+cat test-hello.out
+diff -b test-hello.out tests/test-hello.out > test-hello.diff
+FAILED test-hello.out differs from tests/test-hello.out
+###### FAILED
+
+###### Testing test-if1
+./albs.native < tests/test-if1.sb > test-if1.ll
+lli test-if1.ll > test-if1.out
+cat test-if1.out
+diff -b test-if1.out tests/test-if1.out > test-if1.diff
+FAILED test-if1.out differs from tests/test-if1.out
+###### FAILED
+
+###### Testing test-if2
+./albs.native < tests/test-if2.sb > test-if2.ll
+lli test-if2.ll > test-if2.out
+cat test-if2.out
+diff -b test-if2.out tests/test-if2.out > test-if2.diff
+FAILED test-if2.out differs from tests/test-if2.out
+###### FAILED
+
+###### Testing test-if3
+./albs.native < tests/test-if3.sb > test-if3.ll
+lli test-if3.ll > test-if3.out
+cat test-if3.out
+diff -b test-if3.out tests/test-if3.out > test-if3.diff
+FAILED test-if3.out differs from tests/test-if3.out
+###### FAILED
+
+###### Testing test-if4
+./albs.native < tests/test-if4.sb > test-if4.ll
+lli test-if4.ll > test-if4.out
+cat test-if4.out
+diff -b test-if4.out tests/test-if4.out > test-if4.diff
+FAILED test-if4.out differs from tests/test-if4.out
+###### FAILED
+
+###### Testing test-if5
+./albs.native < tests/test-if5.sb > test-if5.ll
+lli test-if5.ll > test-if5.out
+cat test-if5.out
+diff -b test-if5.out tests/test-if5.out > test-if5.diff
+FAILED test-if5.out differs from tests/test-if5.out
+###### FAILED
+
+###### Testing test-local1
+./albs.native < tests/test-local1.sb > test-local1.ll
+lli test-local1.ll > test-local1.out
+cat test-local1.out
+diff -b test-local1.out tests/test-local1.out > test-local1.diff
+FAILED test-local1.out differs from tests/test-local1.out
+###### FAILED
+
+###### Testing test-local2
+./albs.native < tests/test-local2.sb > test-local2.ll
+lli test-local2.ll > test-local2.out
+cat test-local2.out
+diff -b test-local2.out tests/test-local2.out > test-local2.diff
+FAILED test-local2.out differs from tests/test-local2.out
+###### FAILED
+
+###### Testing test-ops1
+./albs.native < tests/test-ops1.sb > test-ops1.ll
+Fatal error: exception Failure("unrecognized function printb")
+###### FAILED
+
+###### Testing test-ops2
+./albs.native < tests/test-ops2.sb > test-ops2.ll
+Fatal error: exception Failure("unrecognized function printb")
+###### FAILED
+
+###### Testing test-var1
+./albs.native < tests/test-var1.sb > test-var1.ll
+lli test-var1.ll > test-var1.out
+cat test-var1.out
+diff -b test-var1.out tests/test-var1.out > test-var1.diff
+###### SUCCESS
+
+###### Testing test-var2
+./albs.native < tests/test-var2.sb > test-var2.ll
+lli test-var2.ll > test-var2.out
+cat test-var2.out
+diff -b test-var2.out tests/test-var2.out > test-var2.diff
+###### SUCCESS
+
+###### Testing test-while1
+./albs.native < tests/test-while1.sb > test-while1.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test-while2
+./albs.native < tests/test-while2.sb > test-while2.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing fail-assign1
+./albs.native < tests/fail-assign1.sb 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+###### SUCCESS
+
+###### Testing fail-assign2
+./albs.native < tests/fail-assign2.sb 2> fail-assign2.err >> testall.log
+diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
+###### SUCCESS
+
+###### Testing fail-assign3
+./albs.native < tests/fail-assign3.sb 2> fail-assign3.err >> testall.log
+diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-dead1
+./albs.native < tests/fail-dead1.sb 2> fail-dead1.err >> testall.log
+diff -b fail-dead1.err tests/fail-dead1.err > fail-dead1.diff
+###### SUCCESS
+
+###### Testing fail-dead2
+./albs.native < tests/fail-dead2.sb 2> fail-dead2.err >> testall.log
+diff -b fail-dead2.err tests/fail-dead2.err > fail-dead2.diff
+###### SUCCESS
+
+###### Testing fail-expr1
+./albs.native < tests/fail-expr1.sb 2> fail-expr1.err >> testall.log
+diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
+###### SUCCESS
+
+###### Testing fail-expr2
+./albs.native < tests/fail-expr2.sb 2> fail-expr2.err >> testall.log
+diff -b fail-expr2.err tests/fail-expr2.err > fail-expr2.diff
+###### SUCCESS

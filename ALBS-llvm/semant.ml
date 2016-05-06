@@ -48,16 +48,14 @@ let check (globals, functions) =
 
   (* Function declaration for a named function *)
   let built_in_decls =  StringMap.add "print"
-     { typ = Void; fname = "print"; formals = [(Int, "x")];
-       locals = []; body = [] } (StringMap.singleton "printb"
-     { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       locals = []; body = [] })
-   in
+     { typ = Void; fname = "print"; formals = [(Float, "x")];
+       locals = []; body = [] } (StringMap.singleton "print"
+     { typ = Void; fname = "print"; formals = [(Float, "x")];
+       locals = []; body = [] }) in
 
-  let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
+  let  function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
   in
-
   let function_decl s = try StringMap.find s function_decls
        with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
@@ -122,11 +120,16 @@ let check (globals, functions) =
            raise (Failure ("expecting " ^ string_of_int
              (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
-           List.iter2 (fun (ft, _) e -> let et = expr e in
+
+           if fname <> "print"
+           then List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
-                " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
+                " expected. " ^ fname ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
+
+
              fd.formals actuals;
+
            fd.typ
     in
 
