@@ -10,7 +10,7 @@ http://llvm.moe/ocaml/
 module L = Llvm
 module A = Ast
 
-
+module SymbolsMap = Map.Make(String)
 module StringMap = Map.Make(String)
 
 let translate (globals, functions) =
@@ -61,23 +61,42 @@ let translate (globals, functions) =
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
     let local_vars =
+
       let add_formal m (t, n) p = L.set_value_name n p;
-  let local = L.build_alloca (ltype_of_typ t) n builder in
-  ignore (L.build_store p local builder);
-  StringMap.add n local m in
+      let local = L.build_alloca (ltype_of_typ t) n builder in
+      ignore (L.build_store p local builder);
+      StringMap.add n local m in
 
       let add_local m (t, n) =
-  let local_var = L.build_alloca (ltype_of_typ t) n builder
-  in StringMap.add n local_var m in
+      let local_var = L.build_alloca (ltype_of_typ t) n builder
+      in StringMap.add n local_var m in
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
+
       List.fold_left add_local formals fdecl.A.locals in
+
+      (*name vs type*)
+      let symbol_vars =
+
+        let add_to_symbol_table m (t, n) =
+        SymbolsMap.add n t m in
+
+        let symbolmap = List.fold_left add_to_symbol_table SymbolsMap.empty fdecl.A.formals in
+
+        List.fold_left add_to_symbol_table symbolmap fdecl.A.locals in
 
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> StringMap.find n global_vars
     in
+
+
+    (* Return the type for a variable or formal argument *)
+    let lookup_datatype n = try SymbolsMap.find n symbol_vars
+                   with Not_found -> SymbolsMap.find n symbol_vars
+    in
+
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
@@ -107,9 +126,30 @@ let translate (globals, functions) =
 
         | A.FloatLit f -> print_endline ";a.floatlit print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
-        | A.Id i -> print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+        | A.Id my_id ->
+          (
+              let my_typ = lookup_datatype my_id in
 
-        | _ -> print_endline ";_ print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
+              (match my_typ with
+
+
+              | A.Int ->
+
+              print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+
+              | A.Float ->
+
+              print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
+
+              | _ ->
+
+              print_endline ";a.string print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
+
+                )
+
+            )
+
+        | _ -> print_endline ";_ print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
         )
 

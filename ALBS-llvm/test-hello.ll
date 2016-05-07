@@ -1,4 +1,4 @@
-;a.literial print called
+;a.float print called
 ;_ print called
 ; ModuleID = 'ALBS'
 
@@ -14,7 +14,7 @@ entry:
   store i32 4, i32* %x
   store double 4.100000e+00, double* %f
   %f1 = load double* %f
-  %int_printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), double %f1)
-  %abcd = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), i32 5)
+  %float_printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), double %f1)
+  %abcd = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i32 5)
   ret i32 0
 }

@@ -13,56 +13,49 @@ FAILED test-hello.out differs from tests/test-hello.out
 lli test-if1.ll > test-if1.out
 cat test-if1.out
 diff -b test-if1.out tests/test-if1.out > test-if1.diff
-FAILED test-if1.out differs from tests/test-if1.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-if2
 ./albs.native < tests/test-if2.sb > test-if2.ll
 lli test-if2.ll > test-if2.out
 cat test-if2.out
 diff -b test-if2.out tests/test-if2.out > test-if2.diff
-FAILED test-if2.out differs from tests/test-if2.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-if3
 ./albs.native < tests/test-if3.sb > test-if3.ll
 lli test-if3.ll > test-if3.out
 cat test-if3.out
 diff -b test-if3.out tests/test-if3.out > test-if3.diff
-FAILED test-if3.out differs from tests/test-if3.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-if4
 ./albs.native < tests/test-if4.sb > test-if4.ll
 lli test-if4.ll > test-if4.out
 cat test-if4.out
 diff -b test-if4.out tests/test-if4.out > test-if4.diff
-FAILED test-if4.out differs from tests/test-if4.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-if5
 ./albs.native < tests/test-if5.sb > test-if5.ll
 lli test-if5.ll > test-if5.out
 cat test-if5.out
 diff -b test-if5.out tests/test-if5.out > test-if5.diff
-FAILED test-if5.out differs from tests/test-if5.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-local1
 ./albs.native < tests/test-local1.sb > test-local1.ll
 lli test-local1.ll > test-local1.out
 cat test-local1.out
 diff -b test-local1.out tests/test-local1.out > test-local1.diff
-FAILED test-local1.out differs from tests/test-local1.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-local2
 ./albs.native < tests/test-local2.sb > test-local2.ll
 lli test-local2.ll > test-local2.out
 cat test-local2.out
 diff -b test-local2.out tests/test-local2.out > test-local2.diff
-FAILED test-local2.out differs from tests/test-local2.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-ops1
 ./albs.native < tests/test-ops1.sb > test-ops1.ll
@@ -83,10 +76,8 @@ diff -b test-var1.out tests/test-var1.out > test-var1.diff
 
 ###### Testing test-var2
 ./albs.native < tests/test-var2.sb > test-var2.ll
-lli test-var2.ll > test-var2.out
-cat test-var2.out
-diff -b test-var2.out tests/test-var2.out > test-var2.diff
-###### SUCCESS
+Fatal error: exception Not_found
+###### FAILED
 
 ###### Testing test-while1
 ./albs.native < tests/test-while1.sb > test-while1.ll
