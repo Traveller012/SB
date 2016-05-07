@@ -5,6 +5,8 @@
     flt f;
     chr c;
     flt g;
+    bln o;
+    bln p;
 
     x = 1;
     y = 2;
@@ -15,10 +17,15 @@
     x = x + 1; /*4*/
     x = -x; /*-4*/
     f = f + g; /*3.2*/
+    o = true;
+    p = true;
+    o = !o;
+    o = !false;
 
     f = f - 1.1; /*2.1*/
     f= -f; /*-2.1*/
-
+    print(o);
+    print(p);
     print(f);
     print(-x);
     print(f);

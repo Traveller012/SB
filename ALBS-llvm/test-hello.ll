@@ -1,3 +1,5 @@
+;a.string print called
+;a.string print called
 ;a.float print called
 ;_ print called
 ;a.float print called
@@ -17,6 +19,8 @@ entry:
   %f = alloca double
   %c = alloca i8
   %g = alloca double
+  %o = alloca i1
+  %p = alloca i1
   store i32 1, i32* %x
   store i32 2, i32* %y
   store i8 97, i8* %c
@@ -36,19 +40,29 @@ entry:
   %g8 = load double* %g
   %tmp9 = fadd double %f7, %g8
   store double %tmp9, double* %f
-  %f10 = load double* %f
-  %tmp11 = fsub double %f10, 1.100000e+00
-  store double %tmp11, double* %f
+  store i1 true, i1* %o
+  store i1 true, i1* %p
+  %o10 = load i1* %o
+  %tmp11 = xor i1 %o10, true
+  store i1 %tmp11, i1* %o
+  store i1 true, i1* %o
   %f12 = load double* %f
-  %tmp13 = fsub double -0.000000e+00, %f12
+  %tmp13 = fsub double %f12, 1.100000e+00
   store double %tmp13, double* %f
   %f14 = load double* %f
-  %float_printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), double %f14)
-  %x15 = load i32* %x
-  %tmp16 = sub i32 0, %x15
-  %abcd = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i32 %tmp16)
-  %f17 = load double* %f
-  %float_printf18 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), double %f17)
-  %abcd19 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i32 100)
+  %tmp15 = fsub double -0.000000e+00, %f14
+  store double %tmp15, double* %f
+  %o16 = load i1* %o
+  %string_printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i1 %o16)
+  %p17 = load i1* %p
+  %string_printf18 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i1 %p17)
+  %f19 = load double* %f
+  %float_printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), double %f19)
+  %x20 = load i32* %x
+  %tmp21 = sub i32 0, %x20
+  %abcd = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i32 %tmp21)
+  %f22 = load double* %f
+  %float_printf23 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt, i32 0, i32 0), double %f22)
+  %abcd24 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmt1, i32 0, i32 0), i32 100)
   ret i32 0
 }
