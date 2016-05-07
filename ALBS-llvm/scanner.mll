@@ -9,6 +9,7 @@ let digit = ['0'-'9']
 let float = (digit+) ['.'] digit+
 let escaped_char = '\\' ['\\' ''' '"' 'n' 'r' 't']
 let ascii = ([' '-'!' '#'-'[' ']'-'~'])
+let char = ''' (ascii | digit) '''
 let string = '"' ( (ascii | escaped_char)* as s) '"'
 let escape_single_char = ''' (escaped_char) '''
 
@@ -49,6 +50,7 @@ rule token = parse
 | "true"   { TRUE }
 | "false"  { FALSE }
 | float as lxm { FLOAT_LITERAL(float_of_string lxm) }
+| char as lxm  { CHAR_LITERAL( String.get lxm 1 ) }
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | eof { EOF }

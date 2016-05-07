@@ -13,6 +13,8 @@ module A = Ast
 module SymbolsMap = Map.Make(String)
 module StringMap = Map.Make(String)
 
+(* exception LHSMustBeAnId of String;; *)
+
 let translate (globals, functions) =
   let context = L.global_context () in
   let the_module = L.create_module context "ALBS"
@@ -25,7 +27,7 @@ let translate (globals, functions) =
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
-    | A.Char -> i32_t
+    | A.Char -> i8_t
     | A.Float -> f_t
     | A.Void -> void_t in
 
@@ -56,6 +58,7 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
     let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    let char_format_str = L.build_global_stringptr "%c\n" "fmt" builder in
 
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -100,29 +103,24 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
-      | A.FloatLit f -> L.const_float f_t f
-      | A.String_Lit s        -> L.build_global_stringptr s "" builder
-      | A.Literal i -> L.const_int i32_t i
-      | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-      | A.Noexpr -> L.const_int i32_t 0
+      | A.FloatLit f  -> L.const_float f_t f
+      | A.StringLit s -> L.build_global_stringptr s "" builder
+      | A.CharLit c   -> L.const_int i8_t (Char.code c)
+      | A.Literal i   -> L.const_int i32_t i
+      | A.BoolLit b   -> L.const_int i1_t (if b then 1 else 0)
+      | A.Noexpr      -> L.const_int i32_t 0
 
       (*integer literals*)
       | A.Call ("print", [e]) ->
 
         (match List.hd [e] with
 
-        | A.String_Lit s ->
+        | A.StringLit s ->
               let head = expr builder (List.hd [e]) in
               let llvm_val = L.build_in_bounds_gep head [| L.const_int i32_t 0 |] "string_printf" builder in
 
               print_endline ";a.string print called";
               L.build_call printf_func [| llvm_val |] "string_printf" builder
-
-        (* | A.FloatLit f ->
-              let s = expr builder (A.FloatLit f) in
-
-              let llvm_val = L.build_in_bounds_gep s [| L.const_int i32_t 0 |] "" builder in
-              L.build_call printf_func [| llvm_val |] "float_printf" builder *)
 
         | A.FloatLit f -> print_endline ";a.floatlit print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
@@ -132,17 +130,16 @@ let translate (globals, functions) =
 
               (match my_typ with
 
-
               | A.Int ->
-
               print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
               | A.Float ->
-
               print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
-              | _ ->
+              | A.Char ->
+              print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
 
+              | _ ->
               print_endline ";a.string print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
 
                 )
@@ -222,11 +219,24 @@ let translate (globals, functions) =
     (match op with
       | A.Neg     -> L.build_neg
       | A.Not     -> L.build_not) e' "tmp" builder
-      | A.Assign (s, e) -> let e' = expr builder e in
-        ignore (L.build_store e' (lookup s) builder); e'
+      | A.Assign (s, e) ->
+       (
+        	let lhs = lookup s
+            (* match (lookup_datatype s) with
+        	| 	A.Id id ->
+                lookup s
+          | _ -> raise (Failure "LHS must be an id") *)
 
+          in
 
+          let rhs = match e with
+        	| A.Id id -> lookup id
+        	| _ -> expr builder e
 
+          in
+        	ignore (L.build_store rhs lhs builder);
+        	rhs
+        )
 
     in
     (* Invoke "f builder" if the current block doesn't already

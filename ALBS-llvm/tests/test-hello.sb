@@ -2,13 +2,16 @@
 
   int x;
     flt f;
+    chr c;
     x = 4;
 
-  f = 4.1;
+    c = 'a';
+    f = 4.1;
 
 
+    print(c);
     print(f);
-    print(5);
+    print(100);
 
   /*f = 17.4;
   print(5.1);*/

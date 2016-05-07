@@ -7,7 +7,7 @@ type uop = Neg | Not
 
 type typ = Int | Bool | Void | Float | Char
 
-type datatype = Arraytype of typ * int | Datatype of typ | Any
+type datatype = Arraytype of typ * int | Datatype of typ
 
 type bind = typ * string
 
@@ -16,7 +16,8 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | Id of string
-  | String_Lit of string
+  | StringLit of string
+  | CharLit of char
   | Binop of expr * op * expr
   | Unop of uop * expr
   | Assign of string * expr
@@ -61,10 +62,19 @@ let string_of_uop = function
   | Neg -> "-"
   | Not -> "!"
 
+
+  let string_of_typ = function
+    |  Int -> "int"
+    | Bool -> "bln"
+    | Void -> "void"
+    | Float -> "flt"
+    | Char -> "chr"
+
 let rec string_of_expr = function
   | Literal(l) -> string_of_int l
   | FloatLit(f) -> string_of_float f
-  | String_Lit(s) -> "\"" ^ s ^ "\""
+  | CharLit(c) -> String.make 1 c
+  | StringLit(s) -> "\"" ^ s ^ "\""
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | Id(s) -> s
@@ -88,13 +98,6 @@ let rec string_of_stmt = function
       "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
-
-let string_of_typ = function
-  |  Int -> "int"
-  | Bool -> "bln"
-  | Void -> "void"
-  | Float -> "flt"
-  | Char -> "chr"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

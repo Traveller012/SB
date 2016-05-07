@@ -14,6 +14,7 @@ let unescape s =
 %token RETURN IF ELSE FOR WHILE INT FLOAT BOOL VOID CHAR
 %token <int> LITERAL
 %token <float> FLOAT_LITERAL
+%token <char> CHAR_LITERAL
 %token <string> STRING_LITERAL
 %token <string> ID
 %token EOF
@@ -71,6 +72,7 @@ typ:
   | BOOL { Bool }
   | VOID { Void }
   | FLOAT { Float }
+  | CHAR { Char }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -114,9 +116,10 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-  | STRING_LITERAL      { String_Lit(unescape $1) }
+  | STRING_LITERAL   { StringLit(unescape $1) }
   | LITERAL          { Literal($1) }
   | FLOAT_LITERAL    { FloatLit($1) }
+  | CHAR_LITERAL		 { CharLit($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }
