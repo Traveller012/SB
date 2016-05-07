@@ -1,37 +1,10 @@
 { : int} main = [
 
-    int x;
-    int y;
-    flt f;
-    chr c;
-    flt g;
-    bln o;
-    bln p;
-
-    x = 1;
-    y = 2;
-    c = 'a';
-    f = 1.1;
-    g = 2.1;
-    x = x + y; /*3*/
-    x = x + 1; /*4*/
-    x = -x; /*-4*/
-    f = f + g; /*3.2*/
-    o = true;
-    p = true;
-    o = !o;
-    o = !false;
-
-    f = f - 1.1; /*2.1*/
-    f= -f; /*-2.1*/
-    print(o);
-    print(p);
-    print(f);
-    print(-x);
-    print(f);
-    print(100);
-
-  /*f = 17.4;
-  print(5.1);*/
+    int[] a;
+    a = new int[5];
+    a[0]=10;
+    a[2] = 4;
+    print(a[2]);
+    print(a[0]);
   rtn 0;
 ]

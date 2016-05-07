@@ -210,16 +210,9 @@ let translate (globals, functions) =
                       then raise (Failure ("Only 1D arrays are allowed")) (*should throw an exception, not return*)
                     else
                       match t with
-                            (*never hit*)
-                            Arraytype(Char, 1) -> (*Do something!!! add chars maybe*)
-                            let e = List.hd el in
-                            let size = (expr builder e) in
-                            let t = ltype_of_typ t in
-                            let arr = build_array_malloc t size "tmp" builder in
-                            let arr = build_pointercast arr (pointer_type t) "tmp" builder in
-                            (* initialise_array arr size (const_int i32_t 0) 0 builder; *)
-                            arr
+                            
                           |   _ ->
+                            
                             let e = List.hd el in
                             let t = ltype_of_typ t in
 
