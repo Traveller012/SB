@@ -264,7 +264,7 @@ let translate (globals, functions) =
 
         let actuals = List.rev (List.map (expr builder) (List.rev act)) in
         let result = (match fdecl.A.datatype with
-                                     DataType(A.Void) -> ""
+                                     Datatype(Void) -> ""
                                     | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
 
@@ -444,8 +444,8 @@ let translate (globals, functions) =
   A.Block sl -> List.fold_left stmt builder sl
       | A.Expr e -> ignore (expr builder e); builder
       | A.Return e -> ignore (match fdecl.A.datatype with
-    DataType(A.Void) -> L.build_ret_void builder
-  | _ -> L.build_ret (expr builder e) builder); builder
+          Datatype(Void) -> L.build_ret_void builder
+        | _ -> L.build_ret (expr builder e) builder); builder
       | A.If (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
    let merge_bb = L.append_block context "merge" the_function in
@@ -485,7 +485,7 @@ let translate (globals, functions) =
 
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.A.datatype with
-        DataType(A.Void) -> L.build_ret_void
+        Datatype(A.Void) -> L.build_ret_void
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
   in
 

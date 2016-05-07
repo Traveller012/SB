@@ -22,7 +22,7 @@ let check (globals, functions) =
 
   (* Raise an exception if a given binding is to a void type *)
   let check_not_void exceptf = function
-      (Void, n) -> raise (Failure (exceptf n))
+      (Datatype(Void), n) -> raise (Failure (exceptf n))
     | _ -> ()
   in
 
@@ -48,9 +48,9 @@ let check (globals, functions) =
 
   (* Function declaration for a named function *)
   let built_in_decls =  StringMap.add "print"
-     { datatype = DataType(Void); fname = "print"; formals = [(DataType(Float), "x")];
+     { datatype = Datatype(Void); fname = "print"; formals = [(Datatype(Float), "x")];
        locals = []; body = [] } (StringMap.singleton "print"
-     { datatype = DataType(Void); fname = "print"; formals = [(DataType(Float), "x")];
+     { datatype = Datatype(Void); fname = "print"; formals = [(Datatype(Float), "x")];
        locals = []; body = [] }) in
 
   let  function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -88,11 +88,11 @@ let check (globals, functions) =
 
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	    | Literal _ -> DataType(Int)
-      | FloatLit _ -> DataType(Float)
-      | CharLit _ -> DataType(Char)
-      | StringLit _ -> DataType(Int) (* ADDED *)
-      | BoolLit _ -> DataType(Bool)
+	    | Literal _ -> Datatype(Int)
+      | FloatLit _ -> Datatype(Float)
+      | CharLit _ -> Datatype(Char)
+      | StringLit _ -> Datatype(Int) (* ADDED *)
+      | BoolLit _ -> Datatype(Bool)
       | Id s -> type_of_identifier s
 
 
@@ -100,37 +100,35 @@ let check (globals, functions) =
       | ArrayAccess (e , el) -> Datatype(Int)
 
 
-      | ArrayAssign (e1, op, e2) -> Datatype(Int)
-
 
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with
 
-        Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
+        Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Int)
 
-        | Equal | Neq when t1 = t2 -> DataType(Bool)
+        | Equal | Neq when t1 = t2 -> Datatype(Bool)
 
-	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> DataType(Bool)
+	       | Less | Leq | Greater | Geq when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Bool)
 
-	      | And | Or when t1 = DataType(Bool) && t2 = DataType(Bool) -> DataType(Bool)
+	      | And | Or when t1 = Datatype(Bool) && t2 = Datatype(Bool) -> Datatype(Bool)
 
-        | Add | Sub | Mult | Div when t1 = DataType(Float) && t2 = DataType(Float) -> DataType(Float)
-        | Less | Leq | Greater | Geq when t1 = DataType(Float) && t2 = DataType(Float) -> DataType(Bool)
+        | Add | Sub | Mult | Div when t1 = Datatype(Float) && t2 = Datatype(Float) -> Datatype(Float)
+        | Less | Leq | Greater | Geq when t1 = Datatype(Float) && t2 = Datatype(Float) -> Datatype(Bool)
 
 
         | _ -> raise (Failure ("illegal binary operator " ^
-              string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-              string_of_typ t2 ^ " in " ^ string_of_expr e))
+              string_of_datatype t1 ^ " " ^ string_of_op op ^ " " ^
+              string_of_datatype t2 ^ " in " ^ string_of_expr e))
         )
       | Unop(op, e) as ex -> let t = expr e in
 	 (match op with
-	   Neg when t = DataType(Int) -> DataType(Int)
-   | Neg when t = DataType(Float) -> DataType(Float)
-	 | Not when t = DataType(Bool) -> DataType(Bool)
+	   Neg when t = Datatype(Int) -> Datatype(Int)
+   | Neg when t = Datatype(Float) -> Datatype(Float)
+	 | Not when t = Datatype(Bool) -> Datatype(Bool)
          | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
-	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
-      | Noexpr -> Void
-      | Assign(var, e) as ex -> let lt = type_of_identifier var
+	  		   string_of_datatype t ^ " in " ^ string_of_expr ex)))
+      | Noexpr -> Datatype(Void)
+      | Assign(var, e) as ex -> let lt = expr var
                                 and rt = expr e in
         lt
 
@@ -146,16 +144,16 @@ let check (globals, functions) =
            if fname <> "print"
            then List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
-                (Failure ("illegal actual argument found " ^ string_of_typ et ^
-                " expected. " ^ fname ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
+                (Failure ("illegal actual argument found " ^ string_of_datatype et ^
+                " expected. " ^ fname ^ string_of_datatype ft ^ " in " ^ string_of_expr e))))
 
 
              fd.formals actuals;
 
-           fd.typ
+           fd.datatype
     in
 
-    let check_bool_expr e = if expr e != DataType(Bool)
+    let check_bool_expr e = if expr e != Datatype(Bool)
      then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
      else () in
 
@@ -169,9 +167,9 @@ let check (globals, functions) =
          | [] -> ()
         in check_block sl
       | Expr e -> ignore (expr e)
-      | Return e -> let t = expr e in if t = func.typ then () else
-         raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-                         string_of_typ func.typ ^ " in " ^ string_of_expr e))
+      | Return e -> let t = expr e in if t = func.datatype then () else
+         raise (Failure ("return gives " ^ string_of_datatype t ^ " expected " ^
+                         string_of_datatype func.datatype ^ " in " ^ string_of_expr e))
 
       | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
       | For(e1, e2, e3, st) -> ignore (expr e1); check_bool_expr e2;
