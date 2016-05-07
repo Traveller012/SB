@@ -180,7 +180,6 @@ let translate (globals, functions) =
           | A.Geq     -> L.build_fcmp L.Fcmp.Oge
           ) e1' e2' "tmp" builder
 
-
       | A.Literal i ->
           (match op with
             A.Add     -> L.build_add
@@ -240,13 +239,36 @@ let translate (globals, functions) =
         | _ ->  raise (Failure "Invalid")
 
       )
-
-
       | A.Unop(op, e) ->
     let e' = expr builder e in
     (match op with
-      | A.Neg     -> L.build_neg
+      | A.Neg     ->
+
+        (match e with
+
+          | A.FloatLit f ->
+            L.build_fneg
+
+          | A.Literal i ->
+            L.build_neg
+
+          | A.Id my_id ->
+            (
+            let my_typ = lookup_datatype my_id in
+            (match my_typ with
+            | A.Int ->
+                L.build_neg
+            | A.Float ->
+              L.build_fneg
+            | _ -> raise (Failure "Invalid")
+            )
+          )
+          | _ ->  raise (Failure "Invalid")
+
+        )
+
       | A.Not     -> L.build_not) e' "tmp" builder
+
       | A.Assign (s, e) ->
        (
         	let lhs = lookup s
