@@ -8,7 +8,7 @@ let unescape s =
 
 %}
 
-%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON
+%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON NEW
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT FLOAT BOOL VOID CHAR
@@ -44,8 +44,8 @@ decls:
  | decls fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   LBRACE param_types_list COLON typ RBRACE ID ASSIGN param_ids_list LSBRACE vdecl_list stmt_list RSBRACE
-     { { typ = $4;
+   LBRACE param_types_list COLON datatype RBRACE ID ASSIGN param_ids_list LSBRACE vdecl_list stmt_list RSBRACE
+     { { datatype = $4;
 	 fname = $6;
    formals = List.combine $2 $8;
 	 locals = List.rev $10;
@@ -56,8 +56,8 @@ param_types_list:
   | param_types_list_r   { List.rev $1 }
 
 param_types_list_r:
-    typ                   { [($1)] }
-  | param_types_list_r typ { ($2) :: $1 }
+    datatype                   { [($1)] }
+  | param_types_list_r datatype { ($2) :: $1 }
 
 param_ids_list:
     /* nothing */ { [] }
@@ -84,13 +84,9 @@ vdecl:
 array_type:
   typ LSBRACE brackets RSBRACE { Arraytype($1, $3) }
 
-
 datatype:
-    | typ   { $1 }
-
-/*datatype:
   | typ   { Datatype($1) }
-  | array_type { $1 }*/
+  | array_type { $1 }
 
 brackets:
 	|	/* nothing */ 			   { 1 }
@@ -137,9 +133,16 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
+  | expr ASSIGN expr { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | NEW typ bracket_args RSBRACE  { ArrayCreate(Datatype($2), List.rev $3) }
+  | expr bracket_args RSBRACE    { ArrayAccess($1, List.rev $2) }
+
+
+bracket_args:
+  |   LSBRACE expr            { [$2] }
+  |   bracket_args RSBRACE LSBRACE expr { $4 :: $1 }
 
 actuals_opt:
     /* nothing */ { [] }

@@ -10,10 +10,11 @@ http://llvm.moe/ocaml/
 module L = Llvm
 module A = Ast
 
+open Llvm
+open Ast
+
 module SymbolsMap = Map.Make(String)
 module StringMap = Map.Make(String)
-
-(* exception LHSMustBeAnId of String;; *)
 
 let translate (globals, functions) =
   let context = L.global_context () in
@@ -24,12 +25,28 @@ let translate (globals, functions) =
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
 
+
+  let temp_ltype_of_typ (datatype:A.datatype) = match datatype with
+        Datatype(A.Int) -> i32_t
+      | Datatype(A.Bool) -> i1_t
+      | Datatype(A.Float) -> f_t
+      | Datatype(A.Char) -> i32_t
+      | Datatype(A.Void) -> void_t
+      | _ -> void_t in
+
+  let rec get_ptr_type datatype = match datatype with
+    | Arraytype(t, 0) -> temp_ltype_of_typ (Datatype(t))
+    | Arraytype(t, 1) -> pointer_type (temp_ltype_of_typ (Datatype(t)))
+    | Arraytype(t, i) -> pointer_type (get_ptr_type (Arraytype(t, (i-1))))
+    |   _ -> void_t in
+
   let ltype_of_typ = function
-      A.Int -> i32_t
-    | A.Bool -> i1_t
-    | A.Char -> i8_t
-    | A.Float -> f_t
-    | A.Void -> void_t in
+    Datatype(A.Int) -> i32_t
+    | Datatype(A.Bool) -> i1_t
+    | Datatype(A.Float) -> f_t
+    | Datatype(A.Char) -> i32_t
+    | Datatype(A.Void) -> void_t
+    | Arraytype(t, i) -> get_ptr_type (Arraytype(t, (i))) in
 
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
@@ -48,8 +65,10 @@ let translate (globals, functions) =
       let name = fdecl.A.fname
       and formal_types =
   Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
-      in let ftype = L.function_type (ltype_of_typ fdecl.A.typ) formal_types in
-      StringMap.add name (L.define_function name ftype the_module, fdecl) m in
+      in let fdecl_datatype = fdecl.A.datatype
+      in let llvm_fdecl = (ltype_of_typ fdecl_datatype)
+      in let ftype = L.function_type llvm_fdecl formal_types in
+          StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
 
   (* Fill in the body of the given function *)
@@ -101,6 +120,37 @@ let translate (globals, functions) =
     in
 
 
+
+
+        (*Array functions*)
+      let initialise_array arr arr_len init_val start_pos builder =
+          let new_block label =
+            let f = block_parent (insertion_block builder) in
+            append_block (global_context ()) label f
+          in
+          let bbcurr = insertion_block builder in
+          let bbcond = new_block "array.cond" in
+          let bbbody = new_block "array.init" in
+          let bbdone = new_block "array.done" in
+          ignore (build_br bbcond builder);
+          position_at_end bbcond builder;
+
+          (* Counter into the length of the array *)
+          let counter = build_phi [const_int i32_t start_pos, bbcurr] "counter" builder in
+          add_incoming ((build_add counter (const_int i32_t 1) "tmp" builder), bbbody) counter;
+          let cmp = build_icmp Icmp.Slt counter arr_len "tmp" builder in
+          ignore (build_cond_br cmp bbbody bbdone builder);
+          position_at_end bbbody builder;
+
+          (* Assign array position to init_val *)
+          let arr_ptr = build_gep arr [| counter |] "tmp" builder in
+          ignore (build_store init_val arr_ptr builder);
+          ignore (build_br bbcond builder);
+          position_at_end bbdone builder in
+
+
+
+
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
       | A.FloatLit f  -> L.const_float f_t f
@@ -130,13 +180,13 @@ let translate (globals, functions) =
 
               (match my_typ with
 
-              | A.Int ->
+              | Datatype(A.Int) ->
               print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
-              | A.Float ->
+              | Datatype(A.Float) ->
               print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
-              | A.Char ->
+              | Datatype(A.Char) ->
               print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
 
               | _ ->
@@ -150,13 +200,72 @@ let translate (globals, functions) =
 
         )
 
+
+
+
+        (*Arrays*)
+              |  A.ArrayCreate(t, el)      ->
+                  (
+                    if(List.length el > 1) (*list of dimension sizes*)
+                      then raise (Failure ("Only 1D arrays are allowed")) (*should throw an exception, not return*)
+                    else
+                      match t with
+                            (*never hit*)
+                            Arraytype(Char, 1) -> (*Do something!!! add chars maybe*)
+                            let e = List.hd el in
+                            let size = (expr builder e) in
+                            let t = ltype_of_typ t in
+                            let arr = build_array_malloc t size "tmp" builder in
+                            let arr = build_pointercast arr (pointer_type t) "tmp" builder in
+                            (* initialise_array arr size (const_int i32_t 0) 0 builder; *)
+                            arr
+                          |   _ ->
+                            let e = List.hd el in
+                            let t = ltype_of_typ t in
+
+                            let size = (expr builder e) in
+                            let size_t = build_intcast (size_of t) i32_t "tmp" builder in
+                            let size = build_mul size_t size "tmp" builder in
+                            let size_real = build_add size (const_int i32_t 1) "arr_size" builder in
+
+                            let arr = build_array_malloc t size_real "tmp" builder in
+                            let arr = build_pointercast arr (pointer_type t) "tmp" builder in
+
+                            let arr_len_ptr = build_pointercast arr (pointer_type i32_t) "tmp" builder in
+
+                            (* Store length at this position *)
+                            ignore(build_store size_real arr_len_ptr builder);
+                            initialise_array arr_len_ptr size_real (const_int i32_t 0) 0 builder;
+                            arr
+                  )
+
+
+              (*ID and index*)
+              | A.ArrayAccess(e, el)   ->
+                  (
+                    let index = expr builder (List.hd el) in
+                    let index =
+
+                    (*not for chars*)
+                    build_add index (const_int i32_t 1) "tmp" builder
+
+                    in
+                      let arr = expr builder e in
+                      let _val = build_gep arr [| index |] "tmp" builder in
+
+                      if false
+                        then _val
+                      else build_load _val "tmp" builder
+                  )
+
       (*printing functions*)
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 
         let actuals = List.rev (List.map (expr builder) (List.rev act)) in
-        let result = (match fdecl.A.typ with A.Void -> ""
-                                            | _ -> f ^ "_result") in
+        let result = (match fdecl.A.datatype with
+                                     DataType(A.Void) -> ""
+                                    | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
 
       | A.Id s -> L.build_load (lookup s) s builder
@@ -178,6 +287,8 @@ let translate (globals, functions) =
           | A.Leq     -> L.build_fcmp L.Fcmp.Ole
           | A.Greater -> L.build_fcmp L.Fcmp.Ogt
           | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+          | _ -> raise (Failure "Invalid")
+
           ) e1' e2' "tmp" builder
 
       | A.Literal i ->
@@ -200,7 +311,7 @@ let translate (globals, functions) =
         (
           let my_typ = lookup_datatype my_id in
           (match my_typ with
-          | A.Int ->
+          | Datatype(A.Int) ->
             (
               (match op with
                 A.Add     -> L.build_add
@@ -217,7 +328,7 @@ let translate (globals, functions) =
               | A.Geq     -> L.build_icmp L.Icmp.Sge
               ) e1' e2' "tmp" builder
             )
-          | A.Float ->
+          | Datatype(A.Float) ->
             ((match op with
                 A.Add     -> L.build_fadd
               | A.Sub     -> L.build_fsub
@@ -229,6 +340,8 @@ let translate (globals, functions) =
               | A.Leq     -> L.build_fcmp L.Fcmp.Ole
               | A.Greater -> L.build_fcmp L.Fcmp.Ogt
               | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+              | _ -> raise (Failure "Invalid")
+
               ) e1' e2' "tmp" builder
             )
           | _ -> raise (Failure "Invalid")
@@ -256,9 +369,9 @@ let translate (globals, functions) =
             (
             let my_typ = lookup_datatype my_id in
             (match my_typ with
-            | A.Int ->
+            | Datatype(A.Int) ->
                 L.build_neg
-            | A.Float ->
+            | Datatype(A.Float) ->
               L.build_fneg
             | _ -> raise (Failure "Invalid")
             )
@@ -269,23 +382,52 @@ let translate (globals, functions) =
 
       | A.Not     -> L.build_not) e' "tmp" builder
 
-      | A.Assign (s, e) ->
+      | A.Assign (lhs, rhs) ->
        (
-        	let lhs = lookup s
-            (* match (lookup_datatype s) with
-        	| 	A.Id id ->
-                lookup s
-          | _ -> raise (Failure "LHS must be an id") *)
+        	let lhs =
+            (
+              match (lhs) with
+
+              | 	A.Id id ->
+                    lookup id
+
+
+              (*ID and index*)
+              | A.ArrayAccess(e, el)   ->
+
+                let my_val =
+                  match (e) with
+                  | A.Id myaid -> lookup myaid
+                  | _ -> raise (Failure "Invalid") in
+
+
+                let index = expr builder (List.hd el) in
+
+                let index = build_add index (const_int i32_t 1) "tmp" builder in
+                      (
+                          match (e) with
+                          | A.Id myaid ->
+                          (
+                            let name = List.hd [e] in
+                            let arr = L.build_load my_val myaid builder in
+                            let _val = build_gep arr [| index |] "tmp" builder in
+                            _val
+                            )
+                          | _ -> raise (Failure "Invalid")
+                        )
+                      | _ -> raise (Failure "LHS must be an id")
+
+          )
 
           in
 
-          let rhs = match e with
+          let rhs = match rhs with
         	| A.Id id -> lookup id
-        	| _ -> expr builder e
+        	| _ -> expr builder rhs
 
           in
         	ignore (L.build_store rhs lhs builder);
-        	rhs
+          rhs
         )
 
     in
@@ -301,8 +443,8 @@ let translate (globals, functions) =
     let rec stmt builder = function
   A.Block sl -> List.fold_left stmt builder sl
       | A.Expr e -> ignore (expr builder e); builder
-      | A.Return e -> ignore (match fdecl.A.typ with
-    A.Void -> L.build_ret_void builder
+      | A.Return e -> ignore (match fdecl.A.datatype with
+    DataType(A.Void) -> L.build_ret_void builder
   | _ -> L.build_ret (expr builder e) builder); builder
       | A.If (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
@@ -342,8 +484,8 @@ let translate (globals, functions) =
     let builder = stmt builder (A.Block fdecl.A.body) in
 
     (* Add a return if the last block falls off the end *)
-    add_terminal builder (match fdecl.A.typ with
-        A.Void -> L.build_ret_void
+    add_terminal builder (match fdecl.A.datatype with
+        DataType(A.Void) -> L.build_ret_void
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
   in
 

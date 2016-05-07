@@ -48,9 +48,9 @@ let check (globals, functions) =
 
   (* Function declaration for a named function *)
   let built_in_decls =  StringMap.add "print"
-     { typ = Void; fname = "print"; formals = [(Float, "x")];
+     { datatype = DataType(Void); fname = "print"; formals = [(DataType(Float), "x")];
        locals = []; body = [] } (StringMap.singleton "print"
-     { typ = Void; fname = "print"; formals = [(Float, "x")];
+     { datatype = DataType(Void); fname = "print"; formals = [(DataType(Float), "x")];
        locals = []; body = [] }) in
 
   let  function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -88,25 +88,34 @@ let check (globals, functions) =
 
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	    | Literal _ -> Int
-      | FloatLit _ -> Float
-      | CharLit _ -> Char
-      | StringLit _ -> Int (* ADDED *)
-      | BoolLit _ -> Bool
+	    | Literal _ -> DataType(Int)
+      | FloatLit _ -> DataType(Float)
+      | CharLit _ -> DataType(Char)
+      | StringLit _ -> DataType(Int) (* ADDED *)
+      | BoolLit _ -> DataType(Bool)
       | Id s -> type_of_identifier s
+
+
+      | ArrayCreate (t, n) -> Datatype(Int)
+      | ArrayAccess (e , el) -> Datatype(Int)
+
+
+      | ArrayAssign (e1, op, e2) -> Datatype(Int)
+
+
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with
 
         Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
 
-        | Equal | Neq when t1 = t2 -> Bool
+        | Equal | Neq when t1 = t2 -> DataType(Bool)
 
-	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> DataType(Bool)
 
-	      | And | Or when t1 = Bool && t2 = Bool -> Bool
+	      | And | Or when t1 = DataType(Bool) && t2 = DataType(Bool) -> DataType(Bool)
 
-        | Add | Sub | Mult | Div when t1 = Float && t2 = Float -> Float
-        | Less | Leq | Greater | Geq when t1 = Float && t2 = Float -> Bool
+        | Add | Sub | Mult | Div when t1 = DataType(Float) && t2 = DataType(Float) -> DataType(Float)
+        | Less | Leq | Greater | Geq when t1 = DataType(Float) && t2 = DataType(Float) -> DataType(Bool)
 
 
         | _ -> raise (Failure ("illegal binary operator " ^
@@ -115,17 +124,19 @@ let check (globals, functions) =
         )
       | Unop(op, e) as ex -> let t = expr e in
 	 (match op with
-	   Neg when t = Int -> Int
-   | Neg when t = Float -> Float
-	 | Not when t = Bool -> Bool
+	   Neg when t = DataType(Int) -> DataType(Int)
+   | Neg when t = DataType(Float) -> DataType(Float)
+	 | Not when t = DataType(Bool) -> DataType(Bool)
          | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
 	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
-        check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+        lt
+
+        (* check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
 				     " = " ^ string_of_typ rt ^ " in " ^
-				     string_of_expr ex))
+				     string_of_expr ex)) *)
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
            raise (Failure ("expecting " ^ string_of_int
@@ -144,7 +155,7 @@ let check (globals, functions) =
            fd.typ
     in
 
-    let check_bool_expr e = if expr e != Bool
+    let check_bool_expr e = if expr e != DataType(Bool)
      then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
      else () in
 

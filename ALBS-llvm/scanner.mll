@@ -49,6 +49,7 @@ rule token = parse
 | "void"   { VOID }
 | "true"   { TRUE }
 | "false"  { FALSE }
+| "new"  { NEW }
 | float as lxm { FLOAT_LITERAL(float_of_string lxm) }
 | char as lxm  { CHAR_LITERAL( String.get lxm 1 ) }
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
