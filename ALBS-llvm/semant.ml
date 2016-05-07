@@ -96,10 +96,19 @@ let check (globals, functions) =
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with
-          Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	| Equal | Neq when t1 = t2 -> Bool
-	| Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	| And | Or when t1 = Bool && t2 = Bool -> Bool
+
+        Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
+
+        | Equal | Neq when t1 = t2 -> Bool
+
+	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+
+	      | And | Or when t1 = Bool && t2 = Bool -> Bool
+
+        | Add | Sub | Mult | Div when t1 = Float && t2 = Float -> Float
+        | Less | Leq | Greater | Geq when t1 = Float && t2 = Float -> Bool
+
+
         | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
               string_of_typ t2 ^ " in " ^ string_of_expr e))

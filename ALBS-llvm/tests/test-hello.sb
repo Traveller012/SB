@@ -1,15 +1,26 @@
 { : int} main = [
 
-  int x;
+    int x;
+    int y;
     flt f;
     chr c;
-    x = 4;
+    flt g;
 
+    x = 4;
+    y = 8;
     c = 'a';
     f = 4.1;
+    g = 5.5;
+    x = x + y;
+
+    x = x + 3;
+
+    f = f + g;
+
+    f = f - 1.2;
 
 
-    print(c);
+    print(x);
     print(f);
     print(100);
 
