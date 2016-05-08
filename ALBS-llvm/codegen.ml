@@ -16,6 +16,7 @@ open Ast
 module SymbolsMap = Map.Make(String)
 module StringMap = Map.Make(String)
 let struct_types:(string, lltype) Hashtbl.t = Hashtbl.create 10
+let struct_datatypes:(string, string) Hashtbl.t = Hashtbl.create 10
 let struct_field_indexes:(string, int) Hashtbl.t = Hashtbl.create 50
 
 let translate (globals, functions, structs) =
@@ -36,10 +37,15 @@ let translate (globals, functions, structs) =
       | Datatype(A.Void) -> void_t
       | _ -> void_t in
 
+  let find_struct name = 
+    try Hashtbl.find struct_types name
+    with | Not_found ->  raise (Failure ("Struct not found")) in
+
+
   let rec get_ptr_type datatype = match datatype with
     | Arraytype(t, 0) -> temp_ltype_of_typ (Datatype(t))
-    | Arraytype(t, 1) -> pointer_type (temp_ltype_of_typ (Datatype(t)))
-    | Arraytype(t, i) -> pointer_type (get_ptr_type (Arraytype(t, (i-1))))
+    | Arraytype(t, 1) -> L.pointer_type (temp_ltype_of_typ (Datatype(t)))
+    | Arraytype(t, i) -> L.pointer_type (get_ptr_type (Arraytype(t, (i-1))))
     |   _ -> void_t in
 
   let ltype_of_typ = function
@@ -48,7 +54,12 @@ let translate (globals, functions, structs) =
     | Datatype(A.Float) -> f_t
     | Datatype(A.Char) -> i32_t
     | Datatype(A.Void) -> void_t
-    | Arraytype(t, i) -> get_ptr_type (Arraytype(t, (i))) in
+    | Arraytype(t, i) -> get_ptr_type (Arraytype(t, (i)))
+    | Datatype(A.Objecttype(struct_name)) -> L.pointer_type(find_struct struct_name) (*gives llvm for this struct type*)
+
+  in
+
+
 
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
@@ -60,6 +71,8 @@ let translate (globals, functions, structs) =
   (* Declare printf(), which the print built-in function will call *)
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func = L.declare_function "printf" printf_t the_module in
+
+
 
 
   (* Define each struct stub (arguments) so we can create it *)
@@ -78,6 +91,7 @@ let translate (globals, functions, structs) =
 
     let struct_t = Hashtbl.find struct_types sdecl.sname in (*get llvm struct_t code for it*)
 
+
     let type_list = List.map (fun (t,_) -> ltype_of_typ t) sdecl.A.svar_decl_list in (*map the datatypes*)
     let name_list = List.map (fun (_,n) -> n) sdecl.A.svar_decl_list in (*map the names*)
 
@@ -90,6 +104,7 @@ let translate (globals, functions, structs) =
 
     List.iteri (fun i f ->
           let n = sdecl.sname ^ "." ^ f in
+
           Hashtbl.add struct_field_indexes n i; (*add to name struct_field_indices*)
       ) name_list;
 
@@ -136,14 +151,32 @@ let translate (globals, functions, structs) =
       ignore (L.build_store p local builder);
       StringMap.add n local m in
 
-      let add_local m (t, n) =
-      let local_var = L.build_alloca (ltype_of_typ t) n builder
-      in StringMap.add n local_var m in
+      let add_local m (var_type, var_name) = (* map, datatype, name *)
+        
+        let t = match var_type with 
+              Datatype(Objecttype(n)) -> 
+
+              ignore(Hashtbl.add struct_datatypes var_name n);  (* add to map name vs type *)
+
+              find_struct n
+            |   _ -> ltype_of_typ var_type
+          in
+
+          let llvm_for_allocation = L.build_alloca t var_name builder in
+          
+
+          StringMap.add var_name llvm_for_allocation m;
+
+
+        in
+
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
 
       List.fold_left add_local formals fdecl.A.locals in
+
+
 
       (*name vs type*)
       let symbol_vars =
@@ -154,6 +187,8 @@ let translate (globals, functions, structs) =
         let symbolmap = List.fold_left add_to_symbol_table SymbolsMap.empty fdecl.A.formals in
 
         List.fold_left add_to_symbol_table symbolmap fdecl.A.locals in
+
+
 
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
@@ -197,6 +232,40 @@ let translate (globals, functions, structs) =
 
 
 
+          (*Array functions*)
+          let struct_access lhs rhs isAssign builder =
+                        
+
+                        let lhs_type = Hashtbl.find struct_datatypes lhs in
+
+                        let search_term = ( lhs_type ^ "." ^ rhs) in 
+                         
+ 
+                         let field_index = Hashtbl.find struct_field_indexes search_term in
+
+                        let _val = L.build_struct_gep (lookup lhs) field_index rhs builder in
+                        
+                        let _val = (* match d with 
+                          Datatype(Objecttype(_)) -> 
+                          if not isAssign then _val
+                          else build_load _val field builder
+                        
+                        | _ -> *)
+                        if not isAssign then
+                          _val
+                        else
+                          build_load _val rhs builder
+                        
+
+                        in
+                          _val
+
+              
+            
+             in
+
+
+
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
@@ -209,15 +278,17 @@ let translate (globals, functions, structs) =
 
 
 
+      | A.StructAccess(lhs,rhs) -> (
 
-      | A.StructCreate(struct_name, id)  -> 
+                  struct_access lhs rhs false builder
+              )
+
+      | A.StructCreate(struct_name)  -> 
         (
 
 
-          raise (Failure ("Structs still in progress"))
-
-
-
+          raise (Failure ("Structs still in progress 2"))
+ 
 
         )
 
@@ -256,6 +327,11 @@ let translate (globals, functions, structs) =
                 )
 
             )
+
+        | A.StructAccess var field ->
+        (
+            print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+        )
 
         | _ -> print_endline ";_ print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
@@ -436,11 +512,12 @@ let translate (globals, functions, structs) =
 
       | A.Not     -> L.build_not) e' "tmp" builder
 
-      | A.Assign (lhs, rhs) ->
+      | A.Assign (lhs_id, rhs) ->
        (
         	let lhs =
             (
-              match (lhs) with
+              print_endline ";field";
+              match (lhs_id) with
 
               | 	A.Id id ->
                     lookup id
@@ -448,11 +525,12 @@ let translate (globals, functions, structs) =
 
               (*ID and index*)
               | A.ArrayAccess(e, el)   ->
-
-                let my_val =
+              (
+                 let my_val =
                   match (e) with
-                  | A.Id myaid -> lookup myaid
-                  | _ -> raise (Failure "Invalid") in
+                  | A.Id myaid -> 
+                    lookup myaid
+                  | _ -> raise (Failure "Invalid2") in
 
 
                 let index = expr builder (List.hd el) in
@@ -467,16 +545,23 @@ let translate (globals, functions, structs) =
                             let _val = build_gep arr [| index |] "tmp" builder in
                             _val
                             )
-                          | _ -> raise (Failure "Invalid")
-                        )
-                      | _ -> raise (Failure "LHS must be an id")
+                          | _ -> raise (Failure "Invalid3")
+                      )         
+              )
+
+              
+              | A.StructAccess(lhs,rhs) -> (
+
+                  struct_access lhs rhs false builder
+              )
 
           )
 
           in
 
           let rhs = match rhs with
-        	| A.Id id -> lookup id
+          | A.Id id -> lookup id
+          
         	| _ -> expr builder rhs
 
           in

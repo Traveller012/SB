@@ -8,7 +8,7 @@ let unescape s =
 
 %}
 
-%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON NEW STRUCT
+%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON NEW STRUCT DOT
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT FLOAT BOOL VOID CHAR
@@ -50,10 +50,8 @@ sdecl_list:
 sdecl:
   STRUCT ID LSBRACE vdecl_list RSBRACE
   { {
-
    sname = $2;
    svar_decl_list = List.rev $4;
-
   } }
 
 fdecl_list:
@@ -98,11 +96,18 @@ vdecl_list:
 vdecl:
   datatype ID SEMI { ($1, $2) }
 
+obj_type:
+  | STRUCT ID { Objecttype($2) }
+
+singular_type:
+  | typ {$1}
+  | obj_type {$1}
+
 array_type:
   typ LSBRACE brackets RSBRACE { Arraytype($1, $3) }
 
 datatype:
-  | typ   { Datatype($1) }
+  | singular_type { Datatype($1) }
   | array_type { $1 }
 
 brackets:
@@ -151,11 +156,14 @@ expr:
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
   | expr ASSIGN expr { Assign($1, $3) }
+  
+  | ID DOT ID { StructAccess($1,$3) }
+  
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
   | NEW typ bracket_args RSBRACE  { ArrayCreate(Datatype($2), List.rev $3) }
 
-  | STRUCT ID ID { StructCreate($2, $3) } /*stuct_name, variable_name*/
+  | NEW ID { StructCreate($2) } /*stuct_name*/
 
   | expr bracket_args RSBRACE    { ArrayAccess($1, List.rev $2) }
 

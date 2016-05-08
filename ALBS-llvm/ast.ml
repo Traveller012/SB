@@ -5,9 +5,8 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Void | Float | Char 
-
-type datatype = Arraytype of typ * int | Datatype of typ
+type typ = Int | Bool | Void | Float | Char | Objecttype of string
+type datatype = Arraytype of typ * int | Datatype of typ  
 
 type bind = datatype * string
 
@@ -25,7 +24,8 @@ type expr =
   | Noexpr
   | ArrayCreate of datatype * expr list
   | ArrayAccess of expr * expr list
-  | StructCreate of string * string (*struct name, variable name*)
+  | StructAccess of string * string  (*struct_var_name, struct_field_name*)
+  | StructCreate of string (*struct name, variable name*)
 
 type stmt =
     Block of stmt list
@@ -77,6 +77,7 @@ let string_of_uop = function
     | Datatype(Void) -> "void"
     | Datatype(Char) -> "chr"
     | Datatype(Float) -> "flt"
+    | Datatype(Objecttype(name)) -> name
     | Arraytype(t,_) -> string_of_datatype (Datatype(t))
 
   let string_of_typ = function
@@ -85,6 +86,7 @@ let string_of_uop = function
     | Void -> "void"
     | Float -> "flt"
     | Char -> "chr"
+    | Objecttype(name) -> name
 
 let rec string_of_expr = function
   | Literal(l) -> string_of_int l

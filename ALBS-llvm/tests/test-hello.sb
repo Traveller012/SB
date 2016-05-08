@@ -1,21 +1,22 @@
-{ : int} main = [
+{ : int} main = [ 
 
+    struct location l;
+    struct loc l1;
     int[] a;
     a = new int[5];
 
-    /*
-    struct location l;
+    l.x = 123;
 
-    l.x = 10;
-    l.y = 20;
-	*/   
+    l.y = 5.3;
+    
+    print(l.x);
 
+    
     a[0]=10;
     a[2] = 4;
     print(a[2]);
     print(a[0]);
 
-     
 	rtn 0;
 ]
 
@@ -23,7 +24,14 @@ struct location[
 
 	int x;
 	flt y;
-	bln b;
-	chr g;
+	bln b; 
 	
+]
+
+struct loc[
+
+    int x;
+    flt y;
+    bln b; 
+    
 ]

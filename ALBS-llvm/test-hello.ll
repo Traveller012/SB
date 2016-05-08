@@ -1,8 +1,19 @@
 ;struct_decl_stub called
+;struct_decl_stub called
 ;struct_decl called!!
+;struct_decl called!!
+;field
+;field
+;field
+;_ print called
+;field
+;field
 ;_ print called
 ;_ print called
 ; ModuleID = 'ALBS'
+
+%location = type <{ i32, i32, double, i1 }>
+%loc = type <{ i32, i32, double, i1 }>
 
 @fmt = private unnamed_addr constant [4 x i8] c"%f\0A\00"
 @fmt.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00"
@@ -12,6 +23,8 @@ declare i32 @printf(i8*, ...)
 
 define i32 @main() {
 entry:
+  %l = alloca %location
+  %l1 = alloca %loc
   %a = alloca i32*
   %malloccall = tail call i8* @malloc(i32 mul (i32 add (i32 mul (i32 ptrtoint (i32* getelementptr (i32, i32* null, i32 1) to i32), i32 5), i32 1), i32 ptrtoint (i32* getelementptr (i32, i32* null, i32 1) to i32)))
   %tmp = bitcast i8* %malloccall to i32*
@@ -31,20 +44,26 @@ array.init:                                       ; preds = %array.cond
 
 array.done:                                       ; preds = %array.cond
   store i32* %tmp, i32** %a
-  %a4 = load i32*, i32** %a
-  %tmp5 = getelementptr i32, i32* %a4, i32 1
-  store i32 10, i32* %tmp5
-  %a6 = load i32*, i32** %a
-  %tmp7 = getelementptr i32, i32* %a6, i32 3
-  store i32 4, i32* %tmp7
-  %a8 = load i32*, i32** %a
-  %tmp9 = getelementptr i32, i32* %a8, i32 3
-  %tmp10 = load i32, i32* %tmp9
-  %abcd = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.1, i32 0, i32 0), i32 %tmp10)
-  %a11 = load i32*, i32** %a
-  %tmp12 = getelementptr i32, i32* %a11, i32 1
-  %tmp13 = load i32, i32* %tmp12
-  %abcd14 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.1, i32 0, i32 0), i32 %tmp13)
+  %x = getelementptr inbounds %location, %location* %l, i32 0, i32 1
+  store i32 123, i32* %x
+  %y = getelementptr inbounds %location, %location* %l, i32 0, i32 2
+  store double 5.300000e+00, double* %y
+  %x4 = getelementptr inbounds %location, %location* %l, i32 0, i32 1
+  %abcd = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.1, i32 0, i32 0), i32* %x4)
+  %a5 = load i32*, i32** %a
+  %tmp6 = getelementptr i32, i32* %a5, i32 1
+  store i32 10, i32* %tmp6
+  %a7 = load i32*, i32** %a
+  %tmp8 = getelementptr i32, i32* %a7, i32 3
+  store i32 4, i32* %tmp8
+  %a9 = load i32*, i32** %a
+  %tmp10 = getelementptr i32, i32* %a9, i32 3
+  %tmp11 = load i32, i32* %tmp10
+  %abcd12 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.1, i32 0, i32 0), i32 %tmp11)
+  %a13 = load i32*, i32** %a
+  %tmp14 = getelementptr i32, i32* %a13, i32 1
+  %tmp15 = load i32, i32* %tmp14
+  %abcd16 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.1, i32 0, i32 0), i32 %tmp15)
   ret i32 0
 }
 
