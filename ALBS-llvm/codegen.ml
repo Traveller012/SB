@@ -15,8 +15,10 @@ open Ast
 
 module SymbolsMap = Map.Make(String)
 module StringMap = Map.Make(String)
+let struct_types:(string, lltype) Hashtbl.t = Hashtbl.create 10
+let struct_field_indexes:(string, int) Hashtbl.t = Hashtbl.create 50
 
-let translate (globals, functions) =
+let translate (globals, functions, structs) =
   let context = L.global_context () in
   let the_module = L.create_module context "ALBS"
   and i32_t  = L.i32_type  context
@@ -59,14 +61,59 @@ let translate (globals, functions) =
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func = L.declare_function "printf" printf_t the_module in
 
+
+  (* Define each struct stub (arguments) so we can create it *)
+    let struct_decl_stub sdecl =
+
+      let struct_t = L.named_struct_type context sdecl.A.sname in (*make llvm for this struct type*)
+      
+
+      print_endline ";struct_decl_stub called";
+      Hashtbl.add struct_types sdecl.sname struct_t  (* add to map name vs llvm_stuct_type *)
+      in 
+              
+
+  (* Add var_types for each struct so we can create it *)
+    let struct_decl sdecl =
+
+    let struct_t = Hashtbl.find struct_types sdecl.sname in (*get llvm struct_t code for it*)
+
+    let type_list = List.map (fun (t,_) -> ltype_of_typ t) sdecl.A.svar_decl_list in (*map the datatypes*)
+    let name_list = List.map (fun (_,n) -> n) sdecl.A.svar_decl_list in (*map the names*)
+
+    (* Add key all fields in the struct *)
+    let type_list = i32_t :: type_list in
+    let name_list = ".key" :: name_list in
+
+    (* Add key all fields in the struct *)
+    let type_array = (Array.of_list type_list) in
+
+    List.iteri (fun i f ->
+          let n = sdecl.sname ^ "." ^ f in
+          Hashtbl.add struct_field_indexes n i; (*add to name struct_field_indices*)
+      ) name_list;
+
+
+    print_endline ";struct_decl called!!";
+    L.struct_set_body struct_t type_array true
+
+    in  
+
+
+
+  let _ = List.map (fun s -> struct_decl_stub s) structs in
+  let _ = List.map (fun s -> struct_decl s) structs in
+
+
+
   (* Define each function (arguments and return type) so we can call it *)
   let function_decls =
     let function_decl m fdecl =
       let name = fdecl.A.fname
       and formal_types =
   Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
-      in let fdecl_datatype = fdecl.A.datatype
-      in let llvm_fdecl = (ltype_of_typ fdecl_datatype)
+      in let fdecl_datatype = fdecl.A.datatype (*return type*)
+      in let llvm_fdecl = (ltype_of_typ fdecl_datatype) 
       in let ftype = L.function_type llvm_fdecl formal_types in
           StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
@@ -159,6 +206,20 @@ let translate (globals, functions) =
       | A.Literal i   -> L.const_int i32_t i
       | A.BoolLit b   -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr      -> L.const_int i32_t 0
+
+
+
+
+      | A.StructCreate(struct_name, id)  -> 
+        (
+
+
+          raise (Failure ("Structs still in progress"))
+
+
+
+
+        )
 
       (*integer literals*)
       | A.Call ("print", [e]) ->

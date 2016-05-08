@@ -36,20 +36,21 @@ rule token = parse
 | "<="     { LEQ }
 | ">"      { GT }
 | ">="     { GEQ }
-| "&"     { AND }
-| "|"     { OR }
+| "&"      { AND }
+| "|"      { OR }
 | "!"      { NOT }
 | "if"     { IF }
 | "else"   { ELSE }
-| "rtn" { RETURN }
+| "rtn"    { RETURN }
 | "int"    { INT }
 | "flt"    { FLOAT }
-| "bln"   { BOOL }
+| "bln"    { BOOL }
 | "chr"    { CHAR }
 | "void"   { VOID }
 | "true"   { TRUE }
 | "false"  { FALSE }
-| "new"  { NEW }
+| "new"    { NEW }
+| "struct" { STRUCT }
 | float as lxm { FLOAT_LITERAL(float_of_string lxm) }
 | char as lxm  { CHAR_LITERAL( String.get lxm 1 ) }
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }

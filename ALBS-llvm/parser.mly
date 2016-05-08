@@ -8,7 +8,7 @@ let unescape s =
 
 %}
 
-%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON NEW
+%token SEMI LPAREN RPAREN LSBRACE RSBRACE LBRACE RBRACE COMMA COLON NEW STRUCT
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT FLOAT BOOL VOID CHAR
@@ -39,9 +39,26 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { [], [] }
- | decls vdecl { ($2 :: fst $1), snd $1 }
- | decls fdecl { fst $1, ($2 :: snd $1) }
+ | vdecl_list fdecl_list sdecl_list { $1, $2, $3}
+ | /* nothing */ { [], [], [] }
+
+
+sdecl_list:
+    /* nothing */    { [] }
+  | sdecl_list sdecl { $2 :: $1 }
+
+sdecl:
+  STRUCT ID LSBRACE vdecl_list RSBRACE
+  { {
+
+   sname = $2;
+   svar_decl_list = List.rev $4;
+
+  } }
+
+fdecl_list:
+    /* nothing */    { [] }
+  | fdecl_list fdecl { $2 :: $1 }
 
 fdecl:
    LBRACE param_types_list COLON datatype RBRACE ID ASSIGN param_ids_list LSBRACE vdecl_list stmt_list RSBRACE
@@ -137,6 +154,9 @@ expr:
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
   | NEW typ bracket_args RSBRACE  { ArrayCreate(Datatype($2), List.rev $3) }
+
+  | STRUCT ID ID { StructCreate($2, $3) } /*stuct_name, variable_name*/
+
   | expr bracket_args RSBRACE    { ArrayAccess($1, List.rev $2) }
 
 

@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Void | Float | Char
+type typ = Int | Bool | Void | Float | Char 
 
 type datatype = Arraytype of typ * int | Datatype of typ
 
@@ -25,6 +25,7 @@ type expr =
   | Noexpr
   | ArrayCreate of datatype * expr list
   | ArrayAccess of expr * expr list
+  | StructCreate of string * string (*struct name, variable name*)
 
 type stmt =
     Block of stmt list
@@ -42,7 +43,12 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = bind list * func_decl list
+type s_decl = {
+    sname : string;
+    svar_decl_list : bind list;
+  }
+
+type program = bind list * func_decl list * s_decl list
 
 (* Pretty-printing functions *)
 
@@ -124,6 +130,6 @@ let string_of_fdecl fdecl =
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (vars, funcs) =
+let string_of_program (vars, funcs, structs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

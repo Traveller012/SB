@@ -1,3 +1,5 @@
+;struct_decl_stub called
+;struct_decl called!!
 ;_ print called
 ;_ print called
 ; ModuleID = 'ALBS'

@@ -2,9 +2,28 @@
 
     int[] a;
     a = new int[5];
+
+    /*
+    struct location l;
+
+    l.x = 10;
+    l.y = 20;
+	*/   
+
     a[0]=10;
     a[2] = 4;
     print(a[2]);
     print(a[0]);
-  rtn 0;
+
+     
+	rtn 0;
+]
+
+struct location[
+
+	int x;
+	flt y;
+	bln b;
+	chr g;
+	
 ]
