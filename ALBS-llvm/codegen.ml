@@ -52,7 +52,7 @@ let ltype_of_typ = function
 Datatype(A.Int) -> i32_t
 | Datatype(A.Bool) -> i1_t
 | Datatype(A.Float) -> f_t
-| Datatype(A.Char) -> i32_t
+| Datatype(A.Char) -> i8_t
 | Datatype(A.Void) -> void_t
 | Arraytype(t, i) -> get_ptr_type (Arraytype(t, (i)))
 | Datatype(A.Objecttype(struct_name)) -> L.pointer_type(find_struct struct_name) (*gives llvm for this struct type*)
