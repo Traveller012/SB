@@ -137,7 +137,10 @@ let check (globals, functions, structs) =
       | Noexpr -> Datatype(Void)
       | Assign(var, e) as ex -> let lt = expr var
                                 and rt = expr e in
-        lt
+
+                                ignore (check_assign lt rt
+                                  (Failure ("illegal assignment: types dont match left: " ^ string_of_datatype lt ^ " right: " ^ string_of_datatype rt )));
+        lt;
 
         (* check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
 				     " = " ^ string_of_typ rt ^ " in " ^
