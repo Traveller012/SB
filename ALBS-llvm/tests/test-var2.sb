@@ -1,12 +1,12 @@
-int a;
-/*
-{int : void} foo = c [
-  a = c + 42;
+/* int a; */
+
+{int : int} foo = c [
+  rtn c + 42;
 ]
-*/
+
 { : int} main = [
-  /*foo(1);*/
-  a = 3;
+  int a;
+  a = foo(1);
   print(a);
   rtn 0;
 ]
