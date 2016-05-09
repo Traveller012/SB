@@ -29,7 +29,8 @@ let check (globals, functions, structs) =
   (* Raise an exception of the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+    (* print_endline lvaluet; *)
+     if string_of_datatype lvaluet == string_of_datatype rvaluet then lvaluet else raise err
   in
 
   (**** Checking Global Variables ****)
@@ -150,8 +151,8 @@ let check (globals, functions, structs) =
            if fname <> "print"
            then List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
-                (Failure ("illegal actual argument found of type " ^ string_of_datatype et ^ " for " ^ string_of_expr e ^
-              ", " ^ fname ^ " expected " ^ string_of_datatype ft ^ "."))))
+                (Failure ("illegal actual argument found of type " ^ string_of_datatype et ^ " for variable/literal " ^ string_of_expr e ^
+              ", function " ^ fname ^ " expected " ^ string_of_datatype ft ^ "."))))
 
 
              fd.formals actuals;
@@ -159,8 +160,12 @@ let check (globals, functions, structs) =
            fd.datatype
     in
 
-    let check_bool_expr e = if expr e != Datatype(Bool)
-     then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
+    let check_bool_expr e =
+    (*ignore(print_endline (string_of_datatype ( e)) ;); *)
+    (*    ignore(print_endline (string_of_datatype (Datatype(Bool)));)*)
+    if (string_of_datatype (expr e)) <> "bln"
+     then raise (Failure ("expected Boolean expression as type of " ^ string_of_expr e ^
+     " it was " ^ string_of_datatype (expr e)))
      else () in
 
     (* Verify a statement or throw an exception *)
@@ -175,7 +180,7 @@ let check (globals, functions, structs) =
       | Expr e -> ignore (expr e)
       | Return e -> let t = expr e in if t = func.datatype then () else
          raise (Failure ("return gives " ^ string_of_datatype t ^ " expected " ^
-                         string_of_datatype func.datatype ^ " in " ^ string_of_expr e))
+                         string_of_datatype func.datatype ^ " as type for " ^ string_of_expr e))
 
       | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
       | For(e1, e2, e3, st) -> ignore (expr e1); check_bool_expr e2;
