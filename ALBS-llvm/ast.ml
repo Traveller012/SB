@@ -8,7 +8,7 @@ type datatype = Arraytype of typ * int | Datatype of typ
 type bind = datatype * string
 
 type expr =
-    Literal of int
+  | Literal of int
   | Bool of bool
   | BoolLit of bool
   | FloatLit of float

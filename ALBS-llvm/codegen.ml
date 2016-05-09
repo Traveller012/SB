@@ -333,8 +333,32 @@ let n = sdecl.sname ^ "." ^ f in
               (
                 print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
                 )
+          | A.ArrayAccess(e,i) -> (match e with
+            | A.FloatLit f -> print_endline ";ArrayAccess float lit print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+            | A.Id my_id ->
+            (
+              let my_typ = lookup_datatype my_id in
 
-          | _ -> print_endline ";_ print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
+              (match my_typ with
+
+                | Datatype(A.Int) ->
+                print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+
+                | Datatype(A.Float) ->
+                print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
+
+                | Datatype(A.Char) ->
+                print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
+
+                | _ ->
+                print_endline (";a._ in mytype match print called" ^ (string_of_expr e));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
+
+                )
+
+                )
+            | _ -> print_endline (";ArrayAccess print called " ^ (string_of_expr e)); L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+            )
+          | _ -> print_endline ";_ print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
                 )
 
