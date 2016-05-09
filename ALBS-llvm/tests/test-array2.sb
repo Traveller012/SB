@@ -1,13 +1,17 @@
  { : int} main = [
   flt[] a;
+  flt b;
+  b = -2.3;
   a = new flt[5];
 
   a[0]= 1.9;
   a[2] = -2.3;
-/*
-  print(a[2]);
+  print(1.9);
+  print(-2.3);
+  print(b);
   print(a[0]);
-
+  print(a[2]);
+/*
   b = new int[len*2];
   i = 0;
   while (i < len*2) {

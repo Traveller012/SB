@@ -375,8 +375,11 @@ let n = sdecl.sname ^ "." ^ f in
                   (
                     let index = expr builder (List.hd el) in
                     let index = (match e with
-                      | A.FloatLit f ->   build_add index (
-                        const_float f_t 1) "tmp" builder
+                      | A.FloatLit f ->   build_add
+                      index (
+                          const_float f_t
+                          1.0)
+                          "tmp" builder
                       | _ ->   build_add index (const_int i32_t 1) "tmp" builder
                       )
 
