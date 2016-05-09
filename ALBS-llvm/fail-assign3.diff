@@ -1,4 +1,0 @@
-1c1
-< Assertion failed: (getOperand(0)->getType() == cast<PointerType>(getOperand(1)->getType())->getElementType() && "Ptr must be a pointer to Val type!"), function AssertOK, file /tmp/llvm20151214-69554-hagc7s/llvm-3.6.2.src/lib/IR/Instructions.cpp, line 1083.
----
-> Fatal error: exception Failure("illegal assignment int = void in i = myvoid()")
