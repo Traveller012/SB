@@ -7,11 +7,20 @@
 {bln : int} cond = blaahhhh [
 
   int x;
+  bln test;
+  test = false;
+  x = 10;
 
+  print(test);
+  print (x);/*
+  print(blaahhh);
+*/
+  x = 10;
+  /*
   if (blaahhhh)
     x = 42;
   else
     x = 17;
-
+    */
   rtn x;
 ]

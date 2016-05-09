@@ -150,8 +150,8 @@ let check (globals, functions, structs) =
            if fname <> "print"
            then List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
-                (Failure ("illegal actual argument found " ^ string_of_datatype et ^
-                " expected. " ^ fname ^ string_of_datatype ft ^ " in " ^ string_of_expr e))))
+                (Failure ("illegal actual argument found of type " ^ string_of_datatype et ^ " for " ^ string_of_expr e ^
+              ", " ^ fname ^ " expected " ^ string_of_datatype ft ^ "."))))
 
 
              fd.formals actuals;

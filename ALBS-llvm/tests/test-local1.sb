@@ -1,14 +1,22 @@
-{bln : void} foo = i
+{int : int} foo = i
 [
-  int i; 
-
-  i = 42;
- 
-  print(i + i);
-  
+  rtn 1;
 ]
 
+
+/*{bln : void} foo = i
+[
+  int i;
+
+  i = 42;
+
+  print(i + i);
+
+]*/
+
 { : int} main = [
-  foo(true);
+  int x;
+  x = 0;
+  foo(x);
   rtn 0;
 ]
