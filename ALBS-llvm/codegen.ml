@@ -306,6 +306,7 @@ let n = sdecl.sname ^ "." ^ f in
 
           | A.FloatLit f -> print_endline ";a.floatlit print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
+
           | A.Id my_id ->
           (
             let my_typ = lookup_datatype my_id in
@@ -333,7 +334,7 @@ let n = sdecl.sname ^ "." ^ f in
                 print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
                 )
 
-                | _ -> print_endline ";_ print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+          | _ -> print_endline ";_ print called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
 
                 )
 
