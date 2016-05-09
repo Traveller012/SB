@@ -333,7 +333,7 @@ let n = sdecl.sname ^ "." ^ f in
               (
                 print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
                 )
-          | A.ArrayAccess(e,i) -> (match e with
+          | A.ArrayAccess(e2,i2) -> (match e2 with
             | A.FloatLit f -> print_endline ";ArrayAccess float lit print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
             | A.Id my_id ->
             (
@@ -342,7 +342,7 @@ let n = sdecl.sname ^ "." ^ f in
               (match my_typ with
 
                 | int ->
-                print_endline ";mytype int print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+                print_endline ";mytype int_ print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
 
                 | Datatype(A.Int) ->
