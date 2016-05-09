@@ -46,13 +46,16 @@ FAILED test-if5.out differs from tests/test-if5.out
 
 ###### Testing test-local1
 ./albs.native < tests/test-local1.sb > test-local1.ll
-Fatal error: exception Failure("illegal actual argument found bln expected. foobln in true")
+lli test-local1.ll > test-local1.out
+cat test-local1.out
+diff -b test-local1.out tests/test-local1.out > test-local1.diff
+FAILED test-local1.out differs from tests/test-local1.out
 ###### FAILED
 
 ###### Testing test-local2
 ./albs.native < tests/test-local2.sb > test-local2.ll
 Assertion failed: (getOperand(0)->getType() == cast<PointerType>(getOperand(1)->getType())->getElementType() && "Ptr must be a pointer to Val type!"), function AssertOK, file /tmp/llvm20151214-69554-hagc7s/llvm-3.6.2.src/lib/IR/Instructions.cpp, line 1083.
-./testall.sh: line 57: 88640 Abort trap: 6           ./albs.native < tests/test-local2.sb > test-local2.ll
+./testall.sh: line 57: 94126 Abort trap: 6           ./albs.native < tests/test-local2.sb > test-local2.ll
 ###### FAILED
 
 ###### Testing test-ops1
@@ -74,7 +77,7 @@ diff -b test-var1.out tests/test-var1.out > test-var1.diff
 
 ###### Testing test-var2
 ./albs.native < tests/test-var2.sb > test-var2.ll
-Fatal error: exception Failure("illegal actual argument found int expected. fooint in 73")
+Fatal error: exception Not_found
 ###### FAILED
 
 ###### Testing test-while1
@@ -94,7 +97,7 @@ Fatal error: exception Parsing.Parse_error
 ;field
 ;field
 ;field
-./testall.sh: line 67: 88715 Abort trap: 6           ./albs.native < tests/fail-assign1.sb 2> fail-assign1.err >> testall.log
+./testall.sh: line 67: 94202 Abort trap: 6           ./albs.native < tests/fail-assign1.sb 2> fail-assign1.err >> testall.log
 diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
 FAILED fail-assign1.err differs from tests/fail-assign1.err
 ###### FAILED
@@ -102,7 +105,7 @@ FAILED fail-assign1.err differs from tests/fail-assign1.err
 ###### Testing fail-assign2
 ./albs.native < tests/fail-assign2.sb 2> fail-assign2.err >> testall.log
 ;field
-./testall.sh: line 67: 88727 Abort trap: 6           ./albs.native < tests/fail-assign2.sb 2> fail-assign2.err >> testall.log
+./testall.sh: line 67: 94213 Abort trap: 6           ./albs.native < tests/fail-assign2.sb 2> fail-assign2.err >> testall.log
 diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
 FAILED fail-assign2.err differs from tests/fail-assign2.err
 ###### FAILED
@@ -110,7 +113,7 @@ FAILED fail-assign2.err differs from tests/fail-assign2.err
 ###### Testing fail-assign3
 ./albs.native < tests/fail-assign3.sb 2> fail-assign3.err >> testall.log
 ;field
-./testall.sh: line 67: 88738 Abort trap: 6           ./albs.native < tests/fail-assign3.sb 2> fail-assign3.err >> testall.log
+./testall.sh: line 67: 94224 Abort trap: 6           ./albs.native < tests/fail-assign3.sb 2> fail-assign3.err >> testall.log
 diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
 FAILED fail-assign3.err differs from tests/fail-assign3.err
 ###### FAILED
