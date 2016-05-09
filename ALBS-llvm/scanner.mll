@@ -31,6 +31,7 @@ rule token = parse
 | '/'      { DIVIDE }
 | '='      { ASSIGN }
 | ':'      { COLON }
+| "while"  { WHILE }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
