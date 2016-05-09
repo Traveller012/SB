@@ -1,1 +1,1 @@
-Fatal error: exception Failure("illegal assignment bln = int in b = 48")
+Fatal error: exception Failure("illegal assignment: types dont match left: bln right: int")
