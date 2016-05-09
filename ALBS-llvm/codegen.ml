@@ -30,7 +30,7 @@ and void_t = L.void_type context in
 
 
 let temp_ltype_of_typ (datatype:A.datatype) = match datatype with
-Datatype(A.Int) -> i32_t
+| Datatype(A.Int) -> i32_t
 | Datatype(A.Bool) -> i1_t
 | Datatype(A.Float) -> f_t
 | Datatype(A.Char) -> i32_t
@@ -351,6 +351,9 @@ let n = sdecl.sname ^ "." ^ f in
                 | "flt" ->
                 print_endline ";mytype float_ print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
+                | "chr" ->
+                print_endline ";mytpe char_ print called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "char_printf" builder
+
                 | _ ->
                 print_endline (";a._ in mytype match print called" ^ (string_of_datatype my_typ));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
 
@@ -362,9 +365,6 @@ let n = sdecl.sname ^ "." ^ f in
           | _ -> print_endline ";_ print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
                 )
-
-
-
 
                 (*Arrays*)
                 |  A.ArrayCreate(t, el)      ->
@@ -383,10 +383,8 @@ let n = sdecl.sname ^ "." ^ f in
                   let size_t = build_intcast (size_of t) i32_t "tmp" builder in
                   let size = build_mul size_t size "tmp" builder in
                   let size_real = build_add size (const_int i32_t 1) "arr_size" builder in
-
                   let arr = build_array_malloc t size_real "tmp" builder in
                   let arr = build_pointercast arr (pointer_type t) "tmp" builder in
-
                   let arr_len_ptr = build_pointercast arr (pointer_type i32_t) "tmp" builder in
 
                   (* Store length at this position *)
@@ -399,6 +397,7 @@ let n = sdecl.sname ^ "." ^ f in
                   (*ID and index*)
                   | A.ArrayAccess(e, el)   ->
                   (
+                    ignore(print_endline("array access"));
                     let index = expr builder (List.hd el) in
                     let index = (match e with
                       | A.FloatLit f ->   build_add
