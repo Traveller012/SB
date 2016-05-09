@@ -1,10 +1,4 @@
-{int : int} foo = i
-[
-  rtn 1;
-]
-
-
-/*{bln : void} foo = i
+{bln : void} foo = i
 [
   int i;
 
@@ -12,11 +6,11 @@
 
   print(i + i);
 
-]*/
+]
 
 { : int} main = [
   int x;
   x = 0;
-  foo(x);
+  foo(true);
   rtn 0;
 ]

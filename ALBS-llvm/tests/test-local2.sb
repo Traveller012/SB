@@ -1,12 +1,8 @@
 {int bln : int} foo = a b
 [
-  int c;
- 
-  bln d;
-
-  c = a;
-  
-  rtn c + 10;
+  if (b)
+  rtn 10;
+  rtn a + 10;
 ]
 
 { : int} main = [
