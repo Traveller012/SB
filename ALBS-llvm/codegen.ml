@@ -328,7 +328,7 @@ let translate (globals, functions, structs) =
 
             )
 
-        | A.StructAccess var field ->
+        | A.StructAccess(var,field) ->
         (
             print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
         )

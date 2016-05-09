@@ -5,7 +5,7 @@
 ;field
 ;field
 ;field
-;_ print called
+;struct print called
 ;field
 ;field
 ;_ print called
