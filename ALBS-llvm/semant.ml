@@ -30,7 +30,7 @@ let check (globals, functions, structs) =
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
     (* print_endline lvaluet; *)
-     if string_of_datatype lvaluet == string_of_datatype rvaluet then lvaluet else raise err
+     if string_of_datatype( lvaluet) = string_of_datatype( rvaluet) then lvaluet else raise err
   in
 
   (**** Checking Global Variables ****)

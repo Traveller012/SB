@@ -191,7 +191,10 @@ let n = sdecl.sname ^ "." ^ f in
 
 
   (* Return the value for a variable or formal argument *)
+  let print_map_pair key value =
+  print_endline (key ^ " " ^ value ^ "\n") in
   let lookup n = try StringMap.find n local_vars
+  (* ignore(StringMap.iter print_map_pair local_vars); *)
   with Not_found -> StringMap.find n global_vars
   in
 
@@ -310,7 +313,7 @@ let n = sdecl.sname ^ "." ^ f in
           | A.Id my_id ->
           (
             let my_typ = lookup_datatype my_id in
-
+            ignore(print_endline("; my_typ: " ^ string_of_datatype my_typ));
             (match my_typ with
 
               | Datatype(A.Int) ->
@@ -335,24 +338,18 @@ let n = sdecl.sname ^ "." ^ f in
                 )
           | A.ArrayAccess(e2,i2) -> (match e2 with
             | A.FloatLit f -> print_endline ";ArrayAccess float lit print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
-            | A.Id my_id ->
+            | A.Id my_id -> ignore(print_endline(";my_id: " ^ my_id));
             (
               let my_typ = lookup_datatype my_id in
+              ignore(print_endline(";typ: "^ (string_of_datatype my_typ)));
 
-              (match my_typ with
+              (match (string_of_datatype my_typ) with
 
-                | int ->
+                | "int" ->
                 print_endline ";mytype int_ print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
-
-                | Datatype(A.Int) ->
-                print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
-
-                | Datatype(A.Float) ->
-                print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
-
-                | Datatype(A.Char) ->
-                print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
+                | "flt" ->
+                print_endline ";mytype float_ print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
                 | _ ->
                 print_endline (";a._ in mytype match print called" ^ (string_of_datatype my_typ));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
