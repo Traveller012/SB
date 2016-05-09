@@ -96,17 +96,11 @@ let check (globals, functions, structs) =
       | BoolLit _ -> Datatype(Bool)
       | Id s -> type_of_identifier s
 
-
-      | ArrayCreate (t, n) -> Datatype(Int)
-      | ArrayAccess (e , el) -> Datatype(Int)
-
-
+      | ArrayCreate (t, n) -> t
+      | ArrayAccess (e , el) -> expr(e)
 
       | StructAccess (n, f) -> Datatype(Objecttype(""))  (*struct_var_name, struct_field_name*)
       | StructCreate (n) ->  Datatype(Objecttype(""))(*struct name*)
-
-
-
 
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with

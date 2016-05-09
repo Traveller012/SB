@@ -1,10 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or
-
+type op =  Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or
 type uop = Neg | Not
-
 type typ = Int | Bool | Void | Float | Char | Objecttype of string
 type datatype = Arraytype of typ * int | Datatype of typ
 
