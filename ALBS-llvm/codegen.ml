@@ -374,10 +374,11 @@ let n = sdecl.sname ^ "." ^ f in
                   | A.ArrayAccess(e, el)   ->
                   (
                     let index = expr builder (List.hd el) in
-                    let index =
-
-                    (*not for chars*)
-                    build_add index (const_int i32_t 1) "tmp" builder
+                    let index = (match e with
+                      | A.FloatLit f ->   build_add index (
+                        const_float f_t 1) "tmp" builder
+                      | _ ->   build_add index (const_int i32_t 1) "tmp" builder
+                      )
 
                     in
                     let arr = expr builder e in
