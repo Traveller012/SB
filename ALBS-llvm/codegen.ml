@@ -341,6 +341,10 @@ let n = sdecl.sname ^ "." ^ f in
 
               (match my_typ with
 
+                | int ->
+                print_endline ";mytype int print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+
+
                 | Datatype(A.Int) ->
                 print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
@@ -351,7 +355,7 @@ let n = sdecl.sname ^ "." ^ f in
                 print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
 
                 | _ ->
-                print_endline (";a._ in mytype match print called" ^ (string_of_expr e));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
+                print_endline (";a._ in mytype match print called" ^ (string_of_datatype my_typ));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
 
                 )
 
