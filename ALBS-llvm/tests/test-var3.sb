@@ -1,0 +1,10 @@
+{ : int} main = [
+  int a;
+  int b;
+
+  a = 42;
+  b = a;
+
+  print(b);
+  rtn 0;
+]

@@ -1,0 +1,13 @@
+ { : int} main = [
+  
+  chr[] a;
+  a = new chr[5]; 
+
+  /*
+  a[0]= 'a';
+  print(a[0]);
+  */
+
+
+  rtn 0;
+]

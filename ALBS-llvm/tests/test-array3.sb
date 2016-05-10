@@ -1,8 +1,31 @@
  { : int} main = [
-  chr[] a;
-  a = new chr[5]; /*
-  a[0]= 'a';
+ 
+  flt[] a;
+  flt b;
+    
+  a = new flt[5];
+
+  a[0]= 1.0;
+  b = -2.0;
+  a[2] = -3.0; 
+
   print(a[0]);
+  print(a[1]);
+  print(a[2]);
+
+/*
+  b = new int[len*2];
+  i = 0;
+  while (i < len*2) {
+    a[i] = i * -2;
+    i = i + 1;
+  }
+  i = 0;
+  while (i < len*2) {
+    print(a[i]);
+    i = i + 1;
+  }
   */
-  rtn 0;
+
+ 
 ]
