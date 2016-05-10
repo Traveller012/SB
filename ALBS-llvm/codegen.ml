@@ -139,6 +139,7 @@ let build_function_body fdecl =
 	let builder = L.builder_at_end context (L.entry_block the_function) in
 	let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
 	let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+	let bool_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
 	let char_format_str = L.build_global_stringptr "%c\n" "fmt" builder in
 
   (* Construct the function's "locals": formal arguments and locally
@@ -315,8 +316,8 @@ let rec expr builder = function
 		ignore(print_endline("; my_typ: " ^ string_of_datatype my_typ));
 		(match my_typ with
 
-			| Datatype(A.Int) ->
-			print_endline ";a.literial print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
+			| Datatype(A.Int) | Datatype(A.Bool) ->
+			print_endline ";a.int or a.bool print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
 
 			| Datatype(A.Float) ->
 			print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
@@ -326,9 +327,7 @@ let rec expr builder = function
 
 			| _ ->
 			print_endline ";a.string print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
-
 		)
-
 	)
 
 	| A.StructAccess(var,field) ->
@@ -351,7 +350,7 @@ let rec expr builder = function
 				print_endline ";mytype float_ print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
 				| "chr" ->
-				print_endline ";mytpe char_ print called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "char_printf" builder
+				print_endline ";mytype char_ print called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "char_printf" builder
 
 				| _ ->
 				print_endline (";a._ in mytype match print called" ^ (string_of_datatype my_typ));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder

@@ -1,0 +1,25 @@
+ { : int} main = [
+  
+  bln[] a;
+  int len;
+  bln b;
+  int i;
+
+  b = false;
+  len = 3;
+  a = new bln[len];  
+
+  a[0] = true;
+  a[0] = false;
+  a[1] = b;
+  a[2] = true;
+  
+  i = 0;
+  while (i < len) {
+    print(a[i]);
+    i = i + 1;
+  }
+ 
+
+  rtn 0;
+]
