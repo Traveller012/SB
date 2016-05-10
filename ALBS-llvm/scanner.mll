@@ -42,6 +42,7 @@ rule token = parse
 | "|"      { OR }
 | "!"      { NOT }
 | "if"     { IF }
+| "for"    { FOR }
 | "else"   { ELSE }
 | "rtn"    { RETURN }
 | "int"    { INT }
