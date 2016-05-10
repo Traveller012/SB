@@ -18,6 +18,7 @@ module StringMap = Map.Make(String)
 let struct_types:(string, lltype) Hashtbl.t = Hashtbl.create 10
 let struct_datatypes:(string, string) Hashtbl.t = Hashtbl.create 10
 let struct_field_indexes:(string, int) Hashtbl.t = Hashtbl.create 50
+let struct_field_datatypes:(string, datatype) Hashtbl.t = Hashtbl.create 50
 
 let translate (globals, functions, structs) =
 	let context = L.global_context () in
@@ -108,16 +109,47 @@ let struct_decl sdecl =
 		Hashtbl.add struct_field_indexes n i; (*add to name struct_field_indices*)
 	) name_list;
 
-
-	print_endline ";struct_decl called!!";
+ 
 	L.struct_set_body struct_t type_array true
 
 in
 
+(* Add var_types for each struct so we can create it *)
+let struct_decl_field_datatypes sdecl =
 
+
+	let type_list = List.map (fun (t,_) -> t) sdecl.A.svar_decl_list in (*map the datatypes*)
+	let name_list = List.map (fun (_,n) -> n) sdecl.A.svar_decl_list in (*map the names*)
+
+	(* Add key all fields in the struct *)
+	let type_list = (Datatype(A.Int)):: type_list in
+	let name_list = ".key" :: name_list in
+
+(* 
+	ignore(Hashtbl.add struct_field_datatypes "location.a" (Datatype(A.Int)));
+	ignore(Hashtbl.add struct_field_datatypes "location.b" (Datatype(A.Float)));
+	ignore(Hashtbl.add struct_field_datatypes "location.c" (Datatype(A.Bool)));
+	ignore(Hashtbl.add struct_field_datatypes "loc.d" (Datatype(A.Char)));
+	ignore(Hashtbl.add struct_field_datatypes "loc.e" (Datatype(A.Float)));
+	ignore(Hashtbl.add struct_field_datatypes "loc.x" (Datatype(A.Int)));
+ *)
+	ignore(
+
+		List.map2 (fun f t -> 
+			let n = sdecl.sname ^ "." ^ f in
+			Hashtbl.add struct_field_datatypes n t; (*add name, datatype*)	
+		) name_list type_list;
+
+	)
+
+ 
+in
 
 let _ = List.map (fun s -> struct_decl_stub s) structs in
 let _ = List.map (fun s -> struct_decl s) structs in
+
+let struct1 = structs in
+let x = List.map (fun s -> struct_decl_field_datatypes s) struct1 in
 
 
 
@@ -236,38 +268,27 @@ position_at_end bbdone builder in
 
 
 (*Array functions*)
-let struct_access lhs rhs isAssign builder = (*id.field = lhs.rhs*)
+let struct_access struct_id rhs isAssign builder = (*id field*)
 
 
-	let lhs_type = Hashtbl.find struct_datatypes lhs in
+	let struct_name = Hashtbl.find struct_datatypes struct_id in
 
-	let search_term = ( lhs_type ^ "." ^ rhs) in
-
+	let search_term = (struct_name ^ "." ^ rhs) in
 
 	let field_index = Hashtbl.find struct_field_indexes search_term in
 
-	let _val = L.build_struct_gep (lookup lhs) field_index rhs builder in
+	let _val = L.build_struct_gep (lookup struct_id) field_index rhs builder in
 
-  let _val = (* match d with
-    Datatype(Objecttype(_)) ->
-    if not isAssign then _val
-    else build_load _val field builder
+	let _val =  
+		if isAssign then
+			build_load _val rhs builder
+		else
+			_val
 
-  | _ -> *)
-if isAssign then
-	build_load _val rhs builder
-else
+	in
 	_val
 
-
 in
-_val
-
-
-
-in
-
-
 
 
 (* Construct code for an expression; return its value *)
@@ -319,7 +340,7 @@ let rec expr builder = function
 			print_endline ";a.float print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
 
 			| Datatype(A.Char) ->
-			print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "int_printf" builder
+			print_endline ";a.char print called";L.build_call printf_func [| char_format_str ; (expr builder e) |] "char_printf" builder
 
 			| _ ->
 			print_endline ";a.string print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
@@ -328,7 +349,22 @@ let rec expr builder = function
 
 	| A.StructAccess(var,field) ->
 	(
-		print_endline ";struct print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+		let struct_name = Hashtbl.find struct_datatypes var in (*gets name of struct*)
+
+		let search_term = ( struct_name ^ "." ^ field) in (*builds struct_name.field*)
+
+		let my_datatype = Hashtbl.find struct_field_datatypes search_term in (*get datatype*)
+
+		match my_datatype with
+
+		| Datatype(A.Bool) | Datatype(A.Int)  -> print_endline ";struct print int/bool called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+
+		| Datatype(A.Char) -> print_endline ";struct print char called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "abcd" builder
+
+		| Datatype(A.Float) -> print_endline ";struct print float called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
+
+		| _ -> 	print_endline "struct print!!!!!!!";print_endline (string_of_datatype my_datatype);print_endline "struct print!!!!!!!"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
+
 	)
 	| A.ArrayAccess(e2,i2) -> (match e2 with
 		| A.FloatLit f -> print_endline ";ArrayAccess float lit print called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder

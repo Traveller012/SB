@@ -1,38 +1,38 @@
 { : int} main = [ 
 
     struct location l;
-    struct loc l1;
-    int[] a;
-    a = new int[5];
+    struct loc l1; 
 
-    l.x = 123;
-    l1.x = 50;
+    l.a = 100;
+    l.b = 200.2;
+    l.c = false;
 
-    l.y = 5.3;
-    
-    print(l.x);
- 
-    
-    a[0]=10;
-    a[2] = 4;
-    print(a[2]);
-    print(a[0]);
+    l1.d = 'a';
+    l1.e = 5.2;
+    l1.x = 2;
+
+    print(l.a);
+    print(l.b);
+    print(l.c);
+    print(l1.d);
+    print(l1.e);
+    print(l1.x);
+     
 
 	rtn 0;
 ]
 
 struct location[
 
-	int x;
-	flt y;
-	bln b; 
-	
+	int a;
+	flt b;
+ 	
 ]
 
 struct loc[
 
-    int x;
-    flt y;
-    bln b; 
+    chr d;
+    flt e;
+    int x; 
     
 ]
