@@ -375,6 +375,14 @@ let rec expr builder = function
 	then raise (Failure ("Only 1D arrays are allowed")) (*should throw an exception, not return*)
 else
 	match t with
+	| Datatype(Char) -> 
+		
+		let e = List.hd el in
+		let size = (expr builder e) in
+		let t = ltype_of_typ t in
+		let arr = build_array_malloc t size "tmp" builder in
+		let arr = build_pointercast arr (pointer_type t) "tmp" builder in
+		print_endline "; char[] called"; arr
 
 	|   _ ->
 
@@ -394,7 +402,7 @@ else
 	(* Store length at this position *)
 	ignore(build_store size_real arr_len_ptr builder);
 	initialise_array arr_len_ptr size_real (const_int i32_t 0) 0 builder;
-	arr
+	print_endline "; _[] called"; arr
 )
 
 
