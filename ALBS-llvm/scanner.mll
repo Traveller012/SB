@@ -12,7 +12,6 @@ let escaped_char = '\\' ['\\' ''' '"' 'n' 'r' 't']
 let ascii = ([' '-'!' '#'-'[' ']'-'~'])
 let char = ''' (ascii | digit) '''
 let string = '"' ( (ascii | escaped_char)* as s) '"'
-let escape_single_char = ''' (escaped_char) '''
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)

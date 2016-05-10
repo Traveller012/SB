@@ -1,7 +1,9 @@
  { : int} main = [
   chr c;
+  
   c = 'c';
-  print (c);
+
+  print(c);
 
   rtn 0;
 ]

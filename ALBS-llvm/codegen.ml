@@ -33,7 +33,7 @@ let temp_ltype_of_typ (datatype:A.datatype) = match datatype with
 Datatype(A.Int) -> i32_t
 | Datatype(A.Bool) -> i1_t
 | Datatype(A.Float) -> f_t
-| Datatype(A.Char) -> i32_t
+| Datatype(A.Char) -> i8_t
 | Datatype(A.Void) -> void_t
 | _ -> void_t in
 
