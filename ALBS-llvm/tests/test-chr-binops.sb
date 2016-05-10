@@ -1,21 +1,14 @@
 { : int} main = [
-  int x;
-  int y;
+  chr x;
+  chr y;
 
-  x = 2;
-  y = 3;
+  x = 'a';
+  y = 'b';
 
-  x = x + y;
-  print(x);
-
+  x = x + y; 
   x = x - y;
   print(x);
 
-  x = x * y;
-  print(x);
-
-  x = x / y;
-  print(x);
 
 
   if(x==y){
@@ -36,6 +29,8 @@
   if(x>=y){
     print("Greater than or equal\n");
   }
+  x = x*y;
+  x = x/y;
 
   rtn 0;
 ]

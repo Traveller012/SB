@@ -258,8 +258,6 @@ let int_binops op =  (
 					| A.Sub     -> L.build_sub
 					| A.Mult    -> L.build_mul
 					| A.Div     -> L.build_sdiv
-					| A.And     -> L.build_and
-					| A.Or      -> L.build_or
 					| A.Equal   -> L.build_icmp L.Icmp.Eq
 					| A.Neq     -> L.build_icmp L.Icmp.Ne
 					| A.Less    -> L.build_icmp L.Icmp.Slt
@@ -289,18 +287,7 @@ let float_binops op =  (
 	)
 in
 
-let char_binops op =  (
 
-		match op with
-		| A.And     -> L.build_and
-		| A.Or      -> L.build_or
-		| A.Equal   -> L.build_icmp L.Icmp.Eq
-		| A.Neq     -> L.build_icmp L.Icmp.Ne
-		| _ -> raise (Failure "Unsupported char binop")
-
-	)
-	
-in
 
 
 let bool_binops op =  (
@@ -544,7 +531,7 @@ else
 
 		| A.FloatLit f -> (float_binops op) e1' e2' "tmp" builder
 
-		| A.CharLit c -> (char_binops op) e1' e2' "tmp" builder
+		| A.CharLit c -> (int_binops op) e1' e2' "tmp" builder
 
 		| A.Literal i -> (int_binops op) e1' e2' "tmp" builder
 
@@ -553,7 +540,7 @@ else
 			let my_typ = lookup_datatype my_id in
 			(
 				match my_typ with
-				| Datatype(A.Int) -> (int_binops op) e1' e2' "tmp" builder
+				| Datatype(A.Int) | Datatype(A.Char) -> (int_binops op) e1' e2' "tmp" builder
 				
 				| Datatype(A.Bool) -> (bool_binops op) e1' e2' "tmp" builder
 				
