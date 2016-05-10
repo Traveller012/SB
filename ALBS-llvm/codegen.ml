@@ -236,7 +236,7 @@ position_at_end bbdone builder in
 
 
 (*Array functions*)
-let struct_access lhs rhs isAssign builder =
+let struct_access lhs rhs isAssign builder = (*id.field = lhs.rhs*)
 
 
 	let lhs_type = Hashtbl.find struct_datatypes lhs in
@@ -254,10 +254,10 @@ let struct_access lhs rhs isAssign builder =
     else build_load _val field builder
 
   | _ -> *)
-if not isAssign then
-	_val
-else
+if isAssign then
 	build_load _val rhs builder
+else
+	_val
 
 
 in
@@ -283,16 +283,12 @@ let rec expr builder = function
 
 | A.StructAccess(lhs,rhs) -> (
 
-	struct_access lhs rhs false builder
+	struct_access lhs rhs true builder
 )
 
 | A.StructCreate(struct_name)  ->
 (
-
-
 	raise (Failure ("Structs still in progress 2"))
-
-
 )
 
 (*integer literals*)
@@ -340,23 +336,16 @@ let rec expr builder = function
 		(
 			let my_typ = lookup_datatype my_id in
 			ignore(print_endline(";typ: "^ (string_of_datatype my_typ)));
-
 			(match (string_of_datatype my_typ) with
-
 				| "int" ->
 				print_endline ";mytype int_ print called";L.build_call printf_func [| int_format_str ; (expr builder e) |] "int_printf" builder
-
 				| "flt" ->
 				print_endline ";mytype float_ print called";L.build_call printf_func [| float_format_str ; (expr builder e) |] "float_printf" builder
-
 				| "chr" ->
 				print_endline ";mytype char_ print called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "char_printf" builder
-
 				| _ ->
 				print_endline (";a._ in mytype match print called" ^ (string_of_datatype my_typ));L.build_call printf_func [| int_format_str ; (expr builder e) |] "string_printf" builder
-
 			)
-
 		)
 		| _ -> print_endline (";ArrayAccess print called " ^ (string_of_expr e)); L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 	)
@@ -616,7 +605,6 @@ let e' = expr builder e in
 				| _ -> raise (Failure "Invalid3")
 			)
 		)
-
 
 		| A.StructAccess(lhs,rhs) -> (
 

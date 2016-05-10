@@ -75,7 +75,7 @@ let string_of_uop = function
     | Datatype(Void) -> "void"
     | Datatype(Char) -> "chr"
     | Datatype(Float) -> "flt"
-    | Datatype(Objecttype(name)) -> name
+    | Datatype(Objecttype(name)) -> "struct"
     | Arraytype(t,_) -> string_of_datatype (Datatype(t))
 
   let string_of_typ = function
@@ -94,6 +94,7 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | ArrayCreate(d,el) -> string_of_datatype d ^ "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
+  | ArrayAccess(d,el) -> string_of_expr d ^ "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -102,7 +103,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
-  | _ -> ""
+  | _ -> "_"
 
 let rec string_of_stmt = function
     Block(stmts) ->
