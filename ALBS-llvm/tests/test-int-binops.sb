@@ -1,0 +1,13 @@
+{ : int} main = [
+  int x;
+  int y;
+
+  x = 2;
+  y = 3;
+
+  x = x + 3;
+
+  print(x);
+
+  rtn 0;
+]
