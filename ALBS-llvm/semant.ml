@@ -105,12 +105,13 @@ let check (globals, functions, structs) =
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with
 
-        Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Int)
+        | Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Int)
+        | Add | Sub | Mult | Div when t1 = Datatype(Char) && t2 = Datatype(Char) -> Datatype(Char)
+
+	      | And | Or | Equal | Neq | Less | Leq | Greater | Geq when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Bool)
+        | And | Or | Equal | Neq | Less | Leq | Greater | Geq when t1 = Datatype(Char) && t2 = Datatype(Char) -> Datatype(Bool)
 
         | Equal | Neq when t1 = t2 -> Datatype(Bool)
-
-	       | Less | Leq | Greater | Geq when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Bool)
-
 	      | And | Or when t1 = Datatype(Bool) && t2 = Datatype(Bool) -> Datatype(Bool)
 
         | Add | Sub | Mult | Div when t1 = Datatype(Float) && t2 = Datatype(Float) -> Datatype(Float)

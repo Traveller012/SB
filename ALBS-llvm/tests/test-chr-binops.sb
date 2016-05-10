@@ -1,0 +1,37 @@
+{ : int} main = [
+  chr x;
+  chr y;
+
+  x = 'a';
+  y = 'b';
+
+  x = x + y; 
+  x = x - y;
+  print(x);
+
+
+
+  if(x==y){
+    print("Equal\n");
+  }
+  if(x!=y){
+    print("Not equal\n");
+  }
+  if(x<y){
+    print("Less than\n");
+  }
+  if(x>y){
+    print("Greater than\n");
+  }
+  if(x<=y){
+    print("Less than or equal\n");
+  }
+  if(x>=y){
+    print("Greater than or equal\n");
+  }
+  x = x*y;
+  x = x/y;
+
+  rtn 0;
+]
+

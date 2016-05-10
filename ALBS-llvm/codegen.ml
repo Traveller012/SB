@@ -237,7 +237,69 @@ with Not_found -> SymbolsMap.find n symbol_vars
 in
 
 
+(* Return the datatype for a struct *)
+let lookup_struct_datatype(id, field) = 
 
+	let struct_name = Hashtbl.find struct_datatypes id in (*gets name of struct*)
+
+	let search_term = ( struct_name ^ "." ^ field) in (*builds struct_name.field*)
+
+	let my_datatype = Hashtbl.find struct_field_datatypes search_term in (*get datatype*)
+
+	my_datatype
+
+in
+
+
+let int_binops op =  (
+
+				match op with
+					| A.Add     -> L.build_add
+					| A.Sub     -> L.build_sub
+					| A.Mult    -> L.build_mul
+					| A.Div     -> L.build_sdiv
+					| A.Equal   -> L.build_icmp L.Icmp.Eq
+					| A.Neq     -> L.build_icmp L.Icmp.Ne
+					| A.Less    -> L.build_icmp L.Icmp.Slt
+					| A.Leq     -> L.build_icmp L.Icmp.Sle
+					| A.Greater -> L.build_icmp L.Icmp.Sgt
+					| A.Geq     -> L.build_icmp L.Icmp.Sge
+					| _ -> raise (Failure "Invalid Int Binop")
+				)
+in
+
+let float_binops op =  (
+		
+		match op with
+		A.Add     -> L.build_fadd
+		| A.Sub     -> L.build_fsub
+		| A.Mult    -> L.build_fmul
+		| A.Div     -> L.build_fdiv
+		| A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+		| A.Neq     -> L.build_fcmp L.Fcmp.One
+		| A.Less    -> L.build_fcmp L.Fcmp.Ult
+		| A.Leq     -> L.build_fcmp L.Fcmp.Ole
+		| A.Greater -> L.build_fcmp L.Fcmp.Ogt
+		| A.Geq     -> L.build_fcmp L.Fcmp.Oge
+		| _ -> raise (Failure "Invalid")
+
+	
+	)
+in
+
+
+
+
+let bool_binops op =  (
+
+		match op with
+		| A.And     -> L.build_and
+		| A.Or      -> L.build_or
+		| A.Equal   -> L.build_icmp L.Icmp.Eq
+		| A.Neq     -> L.build_icmp L.Icmp.Ne
+		| _ -> raise (Failure "Unsupported bool binop")
+	)	
+in
 
 (*Array functions*)
 let initialise_array arr arr_len init_val start_pos builder =
@@ -315,7 +377,7 @@ let rec expr builder = function
 (*integer literals*)
 | A.Call ("print", [e]) ->
 
-(match List.hd [e] with
+	(match List.hd [e] with
 
 	| A.StringLit s ->
 	let head = expr builder (List.hd [e]) in
@@ -349,11 +411,7 @@ let rec expr builder = function
 
 	| A.StructAccess(var,field) ->
 	(
-		let struct_name = Hashtbl.find struct_datatypes var in (*gets name of struct*)
-
-		let search_term = ( struct_name ^ "." ^ field) in (*builds struct_name.field*)
-
-		let my_datatype = Hashtbl.find struct_field_datatypes search_term in (*get datatype*)
+		let my_datatype = lookup_struct_datatype(var,field) in (*get datatype*)
 
 		match my_datatype with
 
@@ -452,130 +510,67 @@ else
 	else build_load _val "tmp" builder
 )
 
-(*printing functions*)
 | A.Call (f, act) ->
-let (fdef, fdecl) = StringMap.find f function_decls in
+	let (fdef, fdecl) = StringMap.find f function_decls in
 
-let actuals = List.rev (List.map (expr builder) (List.rev act)) in
-let result = (match fdecl.A.datatype with
-	Datatype(Void) -> ""
-	| _ -> f ^ "_result") in
-L.build_call fdef (Array.of_list actuals) result builder
+	let actuals = List.rev (List.map (expr builder) (List.rev act)) in
+	let result = (match fdecl.A.datatype with
+		Datatype(Void) -> ""
+		| _ -> f ^ "_result") in
+	L.build_call fdef (Array.of_list actuals) result builder
 
 | A.Id s -> L.build_load (lookup s) s builder
+
 | A.Binop (e1, op, e2) ->
-let e1' = expr builder e1
-and e2' = expr builder e2 in
+	let e1' = expr builder e1
+	and e2' = expr builder e2 in
 
-(match e1 with
+	(match e1 with
 
-	| A.BoolLit b ->
-	(match op with
-		| A.And     -> L.build_and
-		| A.Or      -> L.build_or
-		| A.Equal   -> L.build_icmp L.Icmp.Eq
-		| A.Neq     -> L.build_icmp L.Icmp.Ne
-		| _ -> raise (Failure "Unsupported BoolLit binop")
-	) e1' e2' "tmp" builder
-	| A.Bool b ->
-	(match op with
-		| A.And     -> L.build_and
-		| A.Or      -> L.build_or
-		| A.Equal   -> L.build_icmp L.Icmp.Eq
-		| A.Neq     -> L.build_icmp L.Icmp.Ne
-		| _ -> raise (Failure "Unsupported Bool (not lit) binop")
-	) e1' e2' "tmp" builder
+		| A.BoolLit b | A.Bool b -> (bool_binops op) e1' e2' "tmp" builder
 
-	| A.FloatLit f ->
-	(match op with
-		A.Add     -> L.build_fadd
-		| A.Sub     -> L.build_fsub
-		| A.Mult    -> L.build_fmul
-		| A.Div     -> L.build_fdiv
-		| A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-		| A.Neq     -> L.build_fcmp L.Fcmp.One
-		| A.Less    -> L.build_fcmp L.Fcmp.Ult
-		| A.Leq     -> L.build_fcmp L.Fcmp.Ole
-		| A.Greater -> L.build_fcmp L.Fcmp.Ogt
-		| A.Geq     -> L.build_fcmp L.Fcmp.Oge
-		| _ -> raise (Failure "Invalid")
+		| A.FloatLit f -> (float_binops op) e1' e2' "tmp" builder
 
-	) e1' e2' "tmp" builder
+		| A.CharLit c -> (int_binops op) e1' e2' "tmp" builder
 
-	| A.Literal i ->
-	(match op with
-		A.Add     -> L.build_add
-		| A.Sub     -> L.build_sub
-		| A.Mult    -> L.build_mul
-		| A.Div     -> L.build_sdiv
-		| A.And     -> L.build_and
-		| A.Or      -> L.build_or
-		| A.Equal   -> L.build_icmp L.Icmp.Eq
-		| A.Neq     -> L.build_icmp L.Icmp.Ne
-		| A.Less    -> L.build_icmp L.Icmp.Slt
-		| A.Leq     -> L.build_icmp L.Icmp.Sle
-		| A.Greater -> L.build_icmp L.Icmp.Sgt
-		| A.Geq     -> L.build_icmp L.Icmp.Sge
-	) e1' e2' "tmp" builder
+		| A.Literal i -> (int_binops op) e1' e2' "tmp" builder
 
-	| A.Id my_id ->
+		| A.Id my_id -> (
+
+			let my_typ = lookup_datatype my_id in
+			(
+				match my_typ with
+				| Datatype(A.Int) | Datatype(A.Char) -> (int_binops op) e1' e2' "tmp" builder
+				
+				| Datatype(A.Bool) -> (bool_binops op) e1' e2' "tmp" builder
+				
+				| Datatype(A.Float) ->	(float_binops op) e1' e2' "tmp" builder
+
+				| _ -> raise (Failure "Invalid Types")
+
+			)		
+		)
+		| _ -> raise (Failure "Invalid Types")
+
+	)
+
+(* | A.StructAccess id field ->
 	(
-		let my_typ = lookup_datatype my_id in
-		(match my_typ with
-			| Datatype(A.Int) ->
-			(
-				(match op with
-					A.Add     -> L.build_add
-					| A.Sub     -> L.build_sub
-					| A.Mult    -> L.build_mul
-					| A.Div     -> L.build_sdiv
-					| A.And     -> L.build_and
-					| A.Or      -> L.build_or
-					| A.Equal   -> L.build_icmp L.Icmp.Eq
-					| A.Neq     -> L.build_icmp L.Icmp.Ne
-					| A.Less    -> L.build_icmp L.Icmp.Slt
-					| A.Leq     -> L.build_icmp L.Icmp.Sle
-					| A.Greater -> L.build_icmp L.Icmp.Sgt
-					| A.Geq     -> L.build_icmp L.Icmp.Sge
-					| _ -> raise (Failure "Invalid Int Binop")
-				) e1' e2' "tmp" builder
-			)
+		let my_datatype = lookup_struct_datatype(var,field) in (*get datatype*)
 
-			| Datatype(A.Bool) ->
-			(
-				(match op with
-					| A.And     -> L.build_and
-					| A.Or      -> L.build_or
-					| A.Equal   -> L.build_icmp L.Icmp.Eq
-					| A.Neq     -> L.build_icmp L.Icmp.Ne
-					| _ -> raise (Failure "Unsupported Bool (not lit) binop")
-				) e1' e2' "tmp" builder
-			)
+		match my_datatype with
 
-			| Datatype(A.Float) ->
-			((match op with
-				A.Add     -> L.build_fadd
-				| A.Sub     -> L.build_fsub
-				| A.Mult    -> L.build_fmul
-				| A.Div     -> L.build_fdiv
-				| A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-				| A.Neq     -> L.build_fcmp L.Fcmp.One
-				| A.Less    -> L.build_fcmp L.Fcmp.Ult
-				| A.Leq     -> L.build_fcmp L.Fcmp.Ole
-				| A.Greater -> L.build_fcmp L.Fcmp.Ogt
-				| A.Geq     -> L.build_fcmp L.Fcmp.Oge
-				| _ -> raise (Failure "Invalid")
+		| Datatype(A.Bool) | Datatype(A.Int)  -> print_endline ";struct print int/bool called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
-			) e1' e2' "tmp" builder
-		)
-			| _ -> raise (Failure "Invalid Types")
+		| Datatype(A.Char) -> print_endline ";struct print char called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "abcd" builder
 
-		)
-)
+		| Datatype(A.Float) -> print_endline ";struct print float called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
 
-| _ ->  raise (Failure "Invalid")
+		| _ -> 	print_endline "struct print!!!!!!!";print_endline (string_of_datatype my_datatype);print_endline "struct print!!!!!!!"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
 
-)
+	) *)
+ 
+
 | A.Unop(op, e) ->
 let e' = expr builder e in
 (match op with
