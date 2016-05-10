@@ -546,29 +546,29 @@ else
 				
 				| Datatype(A.Float) ->	(float_binops op) e1' e2' "tmp" builder
 
-				| _ -> raise (Failure "Invalid Types")
+				| _ -> raise (Failure "Invalid Types of ID binop")
 
 			)		
 		)
+		| A.StructAccess(id,field) ->
+		(
+			let my_datatype = lookup_struct_datatype(id,field) in (*get datatype*)
+
+			match my_datatype with
+
+			| Datatype(A.Bool) -> (bool_binops op) e1' e2' "tmp" builder
+
+			| Datatype(A.Int) | Datatype(A.Char) -> (int_binops op) e1' e2' "tmp" builder
+					
+			| Datatype(A.Float) -> (float_binops op) e1' e2' "tmp" builder
+
+			| _ -> 	raise (Failure "Invalid Types of Struct binop")
+
+		)
+		
 		| _ -> raise (Failure "Invalid Types")
 
 	)
-
-(* | A.StructAccess id field ->
-	(
-		let my_datatype = lookup_struct_datatype(var,field) in (*get datatype*)
-
-		match my_datatype with
-
-		| Datatype(A.Bool) | Datatype(A.Int)  -> print_endline ";struct print int/bool called"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
-
-		| Datatype(A.Char) -> print_endline ";struct print char called"; L.build_call printf_func [| char_format_str ; (expr builder e) |] "abcd" builder
-
-		| Datatype(A.Float) -> print_endline ";struct print float called"; L.build_call printf_func [| float_format_str ; (expr builder e) |] "abcd" builder
-
-		| _ -> 	print_endline "struct print!!!!!!!";print_endline (string_of_datatype my_datatype);print_endline "struct print!!!!!!!"; L.build_call printf_func [| int_format_str ; (expr builder e) |] "abcd" builder
-
-	) *)
  
 
 | A.Unop(op, e) ->

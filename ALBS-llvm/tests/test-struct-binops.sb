@@ -1,0 +1,52 @@
+{ : int} main = [ 
+
+    struct location l;
+
+    l.latitude = 30.1;
+    l.longitude = 60.2;
+
+	l.latitude = l.latitude + l.longitude;
+    print(l.latitude);
+
+	l.latitude = l.latitude - l.longitude;
+    print(l.latitude);
+
+	l.latitude = l.latitude * l.longitude;
+    print(l.latitude);
+
+	l.latitude = l.latitude / l.longitude;
+    print(l.latitude);
+
+    l.x = 5;
+    l.y = 2;
+
+    l.x = l.x + l.y;
+    print(l.x);
+
+    l.x = l.x - l.y;
+    print(l.x);
+
+    l.x = l.x * l.y;
+    print(l.x);
+
+    l.x = l.x / l.y;
+    print(l.x);
+
+    l.c = 'm';
+    l.d = '!';
+    l.c = l.c - l.d;
+	print(l.c);
+
+	rtn 0;
+]
+
+struct location[
+
+	flt latitude;
+	flt longitude;
+	int x;
+	int y;
+	chr c;
+	chr d;
+
+]

@@ -103,7 +103,12 @@ let check (globals, functions, structs) =
       | StructCreate (n) ->  Datatype(Objecttype(""))(*struct name*)
 
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	(match op with
+    
+      if compare (string_of_datatype t1) "struct" = 0 (*don't compare structs*)
+      then  t1
+      else if compare (string_of_datatype t2) "struct" = 0 (*don't compare structs*)                          
+    	then t2
+      else (match op with
 
         | Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Int)
         | Add | Sub | Mult | Div when t1 = Datatype(Char) && t2 = Datatype(Char) -> Datatype(Char)
@@ -133,8 +138,8 @@ let check (globals, functions, structs) =
       | Assign(var, e) as ex -> let lt = expr var
                                 and rt = expr e in
 
-                                if compare (string_of_datatype lt) "struct" != 0 (*don't compare sturcts*)
-                                then if compare (string_of_datatype rt) "struct" != 0 (*don't compare sturcts*)
+                                if compare (string_of_datatype lt) "struct" != 0 (*don't compare structs*)
+                                then if compare (string_of_datatype rt) "struct" != 0 (*don't compare structs*)
                                    then ignore (check_assign lt rt
                                   (Failure ("illegal assignment: types dont match left: " ^ string_of_datatype lt ^ " right: " ^ string_of_datatype rt )));
         lt;
