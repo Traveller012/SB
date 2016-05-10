@@ -1,0 +1,27 @@
+{ : int} main = [ 
+
+    flt f;
+    struct location l1;
+    struct location l2;
+
+    l1.latitude = 30.1;
+    l1.longitude = 60.2;
+    l2.latitude = 30.6;
+    l2.longitude = 60.7;
+
+    f = l1.latitude;
+
+    print(f);
+    print(l1.latitude);
+    print(l1.longitude);  
+    print(l2.longitude);     
+
+    rtn 0;
+]
+
+struct location[
+
+    flt latitude;
+    flt longitude;
+
+]

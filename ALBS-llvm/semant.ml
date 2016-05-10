@@ -133,7 +133,8 @@ let check (globals, functions, structs) =
                                 and rt = expr e in
 
                                 if compare (string_of_datatype lt) "struct" != 0 (*don't compare sturcts*)
-                                then ignore (check_assign lt rt
+                                then if compare (string_of_datatype rt) "struct" != 0 (*don't compare sturcts*)
+                                   then ignore (check_assign lt rt
                                   (Failure ("illegal assignment: types dont match left: " ^ string_of_datatype lt ^ " right: " ^ string_of_datatype rt )));
         lt;
 
