@@ -10,7 +10,7 @@
 *.diff
 *.err
 *.ll
-*.out
+./*.out
 *.log
 # ocamlbuild working directory
 _build/
