@@ -1,4 +1,3 @@
-/* int a; */
 
 {int : int} foo = c [
   rtn c + 42;

@@ -1,5 +1,5 @@
 { : int} main = [
- float x;
+ flt x;
  x = -10.0;
  x = 0.0 + -x;
  print(x);
