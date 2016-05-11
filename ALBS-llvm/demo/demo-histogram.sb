@@ -11,15 +11,9 @@
     i = 0;
     numberOfLines = 0;
     charTotals = new int[numberOfChars];
-    print("before zeroing out\n");
-    print(charTotals);
     zeroOutArray(charTotals, numberOfChars);
-    print("after zeroing out\n");
-    printIntArray(charTotals, numberOfChars);
     countFrequency(charTotals, numberOfChars);
-    printIntArray(charTotals, numberOfChars);
     numberOfLines = highestIntOfArray(charTotals, numberOfChars);
-    printIntArray(charTotals, numberOfChars);
     printHistogram(charTotals, numberOfChars, numberOfLines);
     rtn 0;
 ]
@@ -40,7 +34,7 @@
   int i;
   int currentValue;
 
-  print("Histogram follows:\n");
+  print("\nHistogram follows:\n");
 
   outerCount = maxSize;
   while(outerCount > 0) {
@@ -57,7 +51,7 @@
     print("\n");
     outerCount = outerCount - 1;
   }
-  print("a b c d e f g h i j k l m n o p q r s t u v w x y z");
+  print("a b c d e f g h i j k l m n o p q r s t u v w x y z\n");
 
 ]
 
@@ -102,7 +96,6 @@
     while(c != '\r'){
 
         c = getchar();
-        print(c);
 
         j = addChrToInt(c,-97);
 
