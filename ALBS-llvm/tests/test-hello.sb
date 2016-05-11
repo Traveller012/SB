@@ -1,16 +1,22 @@
-{ : int} main = [ 
+(*{ : int} main = [ 
 
     chr c;
-    chr[] arr;
     int i;
+    int j;
+    
+    chr[] arr;
     int len;
+    arr = new chr[50];
+ 
 
     i = 0;
-    arr = new chr[50];
-
-
     while(c != '\r'){ 
         c = getchar();
+
+
+        j = addChrToInt(c,-97);
+        print(j);
+
         arr[i] = c;
         i = i + 1;
     }
@@ -22,24 +28,217 @@
         print(arr[i]);
         i = i + 1;
     }
- 
- 
+
 	rtn 0;
 ]
+*)
 
+{ : int} main = [
+
+    chr c;
+    int[] charTotals;
+    int i;
+    int numberOfLines;
+    int len;
+    int numberOfChars;
+
+    numberOfChars = 10;
+    i = 0;
+    numberOfLines = 0;
+    charTotals = new int[numberOfChars];
+    zeroOutArray(charTotals, numberOfChars);
+    countFrequency(charTotals, numberOfChars);
+    numberOfLines = highestIntOfArray(charTotals, numberOfChars);
+    printHistogram(charTotals, numberOfChars);
+    rtn 0;
+]
+
+{ int[] int : void } zeroOutArray = intArr sizeOfArray [
+  int i;
+  i = 0;
+  while (i < sizeOfArray) {
+    intArr[i] = 0;
+    i = i + 1;
+  }
+]
+
+{ int[] int : void } printHistogram = countArr sizeOfArray [
+
+  int outerCount;
+  int innerCount;
+  int i;
+  int currentValue;
+
+  print("Histogram follows:\n");
+
+  outerCount = sizeOfArray;
+  while(outerCount > 0) {
+    innerCount = 0;
+    while(innerCount < sizeOfArray) {
+      currentValue = countArr[innerCount];
+      if (currentValue >= outerCount) {
+        print("x ");
+      } else {
+        print("  ");
+      }
+      innerCount = innerCount + 1;
+    }
+    print("\n");
+    outerCount = outerCount - 1;
+  }
+  print("a b c d e f g h i j k l m n o p q r s t u v w x y z");
+
+]
+
+{ int[] int : void } printIntArray = intArr sizeOfArray [
+  int i;
+  i = 0;
+  while (i < sizeOfArray) {
+    print(intArr[i]);
+    i = i + 1;
+  }
+]
+
+{int[] int : int } highestIntOfArray = intArr sizeOfArray [
+  int highestInt;
+  int i;
+  int current;
+  highestInt = 0;
+  i = 0;
+
+  while (i < sizeOfArray) {
+      current = intArr[i];
+      if (current > highestInt) {
+          highestInt = current;
+        }
+      i = i + 1;
+  }
+  rtn highestInt;
+]
+
+{int[] int : void } countFrequency = intArr sizeOfArray [
+  int i;
+  int h;
+  int cAsInt;
+  int charNum;
+  chr c;
+  int temp;
+  int j;
+
+    while(c != '\r'){ 
+    
+        c = getchar();
+
+        j = addChrToInt(c,-97);
+
+      temp = intArr[j]; (* index of char *)
+      temp = temp + 1; (* increment by 1 *)
+      intArr[j]= temp;
+
+
+        i = i + 1;
+    }
+
+  rtn;
+]
+
+{chr int : int} addChrToInt = c offset [
+
+    if (c == 'a' ) {
+        offset = offset + 'a';
+    }
+    if (c == 'b' ) {
+        offset = offset + 'b';
+    }
+  if (c == 'c' ) {
+        offset = offset + 'c';
+   }
+  if (c == 'd' ) {
+        offset = offset + 'd';
+   }
+  if (c == 'e' ) {
+        offset = offset + 'e';
+   }
+  if (c == 'f' ) {
+        offset = offset + 'f';
+   }
+  if (c == 'g' ) {
+        offset = offset + 'g';
+   }
+  if (c == 'h' ) {
+        offset = offset + 'h';
+   }
+  if (c == 'i' ) {
+        offset = offset + 'i';
+   }
+  if (c == 'j' ) {
+        offset = offset + 'j';
+   }
+  if (c == 'k' ) {
+        offset = offset + 'k';
+   }
+  if (c == 'l' ) {
+        offset = offset + 'l';
+   }
+  if (c == 'm' ) {
+        offset = offset + 'm';
+   }
+  if (c == 'n' ) {
+        offset = offset + 'n';
+   }
+  if (c == 'o' ) {
+        offset = offset + 'o';
+   }
+  if (c == 'p' ) {
+        offset = offset + 'p';
+   }
+  if (c == 'q' ) {
+        offset = offset + 'q';
+   }
+  if (c == 'r' ) {
+        offset = offset + 'r';
+   }
+  if (c == 's' ) {
+        offset = offset + 's';
+   }
+  if (c == 't' ) {
+        offset = offset + 't';
+   }
+  if (c == 'u' ) {
+        offset = offset + 'u';
+   }
+  if (c == 'v' ) {
+        offset = offset + 'v';
+   }
+  if (c == 'w' ) {
+        offset = offset + 'w';
+   }
+  if (c == 'x' ) {
+        offset = offset + 'x';
+   }
+  if (c == 'y' ) {
+        offset = offset + 'y';
+   }
+  if (c == 'z' ) {
+        offset = offset + 'z';
+   }
+
+   rtn offset;
+ ]
 (*
-
-i/p:  dfsbcnxzm\r
+i/p:  sdfgyhfjasdxngeusrhaaaaa\r
 
 o/p:
-d
-f
-s
-b
-c
-n
-x
-z
-m
-
+Histogram follows:
+                    
+                    
+                    
+                    
+x                   
+x                   
+x                   
+x                   
+x     x   x x x     
+x     x x x x x   x 
+a b c d e f g h i j k l m n o p q r s t u v w x y z
 *)

@@ -536,6 +536,7 @@ else
 	let e1' = expr builder e1
 	and e2' = expr builder e2 in
 
+	ignore(print_endline ";in binop");
 	(match e1 with
 
 		| A.BoolLit b | A.Bool b -> (bool_binops op) e1' e2' "tmp" builder
@@ -545,13 +546,48 @@ else
 		| A.CharLit c -> (int_binops op) e1' e2' "tmp" builder
 
 		| A.Literal i -> (int_binops op) e1' e2' "tmp" builder
+		
 
 		| A.Id my_id -> (
 
 			let my_typ = lookup_datatype my_id in
 			(
 				match my_typ with
-				| Datatype(A.Int) | Datatype(A.Char) -> (int_binops op) e1' e2' "tmp" builder
+				| Datatype(A.Int) -> (
+						ignore(print_endline ";matched int ID here");
+
+						 match op with
+						| A.Add   
+						| A.Sub   
+						| A.Mult    
+						| A.Div     -> 
+						(	 match e2 with
+							| A.CharLit c -> (
+								ignore(print_endline ";matched op");
+								ignore(print_endline ";matched char here");
+
+								let temp_int_val = Char.code c in
+
+
+								let temp = L.const_int i32_t temp_int_val in
+								let e2' = (temp) in
+								(int_binops op) e1' e2' "tmp" builder
+
+							)
+							| _ -> (int_binops op) e1' e2' "tmp" builder
+
+						)
+						| A.Equal   
+						| A.Neq    
+						| A.Less   
+						| A.Leq    
+						| A.Greater 
+						| A.Geq     -> ignore(print_endline ";normal int op");(int_binops op) e1' e2' "tmp" builder
+
+						| _ -> raise (Failure "Invalid Int Binop")
+				)	
+				
+				|  Datatype(A.Char)  -> (int_binops op) e1' e2' "tmp" builder
 				
 				| Datatype(A.Bool) -> (bool_binops op) e1' e2' "tmp" builder
 				
@@ -625,7 +661,7 @@ let e' = expr builder e in
 (
 	let lhs =
 	(
-		print_endline ";field";
+		print_endline ";assign";
 		match (lhs) with
 
 		| A.Id id -> lookup id
@@ -667,7 +703,7 @@ let e' = expr builder e in
 in
 
 let rhs = match rhs with
-| A.Id id -> print_endline ";lookup id"; expr builder rhs
+| A.Id id -> print_endline ";lookup RHS id"; expr builder rhs
 
 | _ -> expr builder rhs
 

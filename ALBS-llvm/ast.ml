@@ -73,7 +73,7 @@ let string_of_uop = function
     | Datatype(Int) -> "int"
     | Datatype(Bool) -> "bln"
     | Datatype(Void) -> "void"
-    | Datatype(Char) -> "chr"
+    | Datatype(Char) -> "int"
     | Datatype(Float) -> "flt"
     | Datatype(Objecttype(name)) -> "struct"
     | Arraytype(t,_) -> string_of_datatype (Datatype(t))

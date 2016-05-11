@@ -30,7 +30,8 @@ let check (globals, functions, structs) =
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
     (* print_endline lvaluet; *)
-     if string_of_datatype( lvaluet) = string_of_datatype( rvaluet) then lvaluet else raise err
+     if string_of_datatype( lvaluet) = string_of_datatype( rvaluet) then lvaluet 
+   else  raise err
   in
 
   (**** Checking Global Variables ****)
@@ -116,6 +117,7 @@ let check (globals, functions, structs) =
       else (match op with
 
         | Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Int)
+        | Add | Sub | Mult | Div when t1 = Datatype(Int) && t2 = Datatype(Char) -> Datatype(Int)
         | Add | Sub | Mult | Div when t1 = Datatype(Char) && t2 = Datatype(Char) -> Datatype(Char)
 
 	      | And | Or | Equal | Neq | Less | Leq | Greater | Geq when t1 = Datatype(Int) && t2 = Datatype(Int) -> Datatype(Bool)
