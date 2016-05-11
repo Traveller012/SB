@@ -10,7 +10,7 @@ let float = '-'?(digit+) ['.'] digit+
 let bool = "true" | "false"
 let escaped_char = '\\' ['\\' ''' '"' 'n' 'r' 't']
 let ascii = ([' '-'!' '#'-'[' ']'-'~'])
-let char = ''' (ascii | digit) '''
+let char = ''' (ascii | digit) ''' | ''' escaped_char ''' 
 let string = '"' ( (ascii | escaped_char)* as s) '"'
 
 rule token = parse

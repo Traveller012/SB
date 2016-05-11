@@ -1,19 +1,45 @@
 { : int} main = [ 
 
     chr c;
-    
-    print("Enter character: ");
-    c = getchar();
- 
-    print("Character entered: ");    
-    print(c);
+    chr[] arr;
+    int i;
+    int len;
+
+    i = 0;
+    arr = new chr[50];
 
 
-    print("Enter character: ");
-    c = getchar();
+    while(c != '\r'){ 
+        c = getchar();
+        arr[i] = c;
+        i = i + 1;
+    }
+    len = i-1;
+
+    i = 0;
+
+    while(i<len){
+        print(arr[i]);
+        i = i + 1;
+    }
  
-    print("Character entered: ");    
-    print(c);
  
 	rtn 0;
 ]
+
+(*
+
+i/p:  dfsbcnxzm\r
+
+o/p:
+d
+f
+s
+b
+c
+n
+x
+z
+m
+
+*)
