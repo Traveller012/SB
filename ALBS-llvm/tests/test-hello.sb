@@ -1,38 +1,16 @@
 { : int} main = [ 
 
-    struct location l;
-    struct loc l1; 
+    chr c;
 
-    l.a = 100;
-    l.b = 200.2;
-    l.c = false;
+    c = 'b';
+    print(c);
 
-    l1.d = 'a';
-    l1.e = 5.2;
-    l1.x = 2;
-
-    print(l.a);
-    print(l.b);
-    print(l.c);
-    print(l1.d);
-    print(l1.e);
-    print(l1.x);
-     
-
-	rtn 0;
-]
-
-struct location[
-
-	int a;
-    flt b;
-    bln c;	
-]
-
-struct loc[
-
-    chr d;
-    flt e;
-    int x; 
+    c = getchar();
     
+    print(c);
+
+    c = getchar();
+    print(c);
+ 
+	rtn 0;
 ]

@@ -329,6 +329,9 @@ position_at_end bbdone builder in
 
 
 
+let getchar_ty = (L.function_type i8_t [||]) in
+let getchar_func = L.declare_function "getchar" getchar_ty the_module in
+
 (*Array functions*)
 let struct_access struct_id rhs isAssign builder = (*id field*)
 
@@ -375,9 +378,17 @@ let rec expr builder = function
 )
 
 (*integer literals*)
+| A.Call ("getchar", el) -> 
+
+	let f = getchar_func in
+	let params = List.map (expr builder) el in	
+	print_endline ";hi"; build_call f (Array.of_list params) "tmp" builder
+
+
 | A.Call ("print", [e]) ->
 
 	(match List.hd [e] with
+
 
 	| A.StringLit s ->
 	let head = expr builder (List.hd [e]) in
