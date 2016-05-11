@@ -1,15 +1,18 @@
 { : int} main = [ 
 
     chr c;
-
-    c = 'b';
-    print(c);
-
-    c = getchar();
     
+    print("Enter character: ");
+    c = getchar();
+ 
+    print("Character entered: ");    
     print(c);
 
+
+    print("Enter character: ");
     c = getchar();
+ 
+    print("Character entered: ");    
     print(c);
  
 	rtn 0;
