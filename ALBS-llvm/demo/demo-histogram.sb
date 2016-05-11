@@ -51,7 +51,7 @@
     print("\n");
     outerCount = outerCount - 1;
   }
-  print("a b c d e f g h i j k l m n o p q r s t u v w x y z\n");
+  print("a b c d e f g h i j k l m n o p q r s t u v w x y z other\n");
 
 ]
 
@@ -98,6 +98,14 @@
         c = getchar();
 
         j = addChrToInt(c,-97);
+
+        if(j<0){
+          j = 26;
+        }
+ 
+        if(j>25){
+           j = 26;
+        }
 
       temp = intArr[j]; (* index of char *)
       temp = temp + 1; (* increment by 1 *)
