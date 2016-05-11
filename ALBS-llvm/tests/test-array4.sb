@@ -2,12 +2,14 @@
 	
 	chr[] a;
 	int i;
+	chr c;
 	a = new chr[5]; 
 
 	a[0] = 'b';
 	a[0] = 'a';
 	
-	print(a[0]);
+	c = a[0];
+	print(c);
 
 	a[1] = 'b';
 	a[2] = 'c';
@@ -16,7 +18,8 @@
 
 	i = 0;
 	while (i < 5) {
-		print(a[i]);
+		c = a[i];
+		print(c);
 		i = i + 1;
 	}
 	  
