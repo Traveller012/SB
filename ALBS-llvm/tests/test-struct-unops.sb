@@ -1,0 +1,24 @@
+{ : int} main = [ 
+
+    struct location l;
+
+    l.a = 30.1;
+    l.a = -l.a;
+    print(l.a);
+
+    l.x = 5;
+    l.x = -l.x;
+    print(l.x);
+
+    l.c = 'm';
+    l.c = -l.c;
+
+	rtn 0;
+]
+
+struct location[
+
+	flt a;
+	int x;
+	chr c;
+]

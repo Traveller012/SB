@@ -128,6 +128,10 @@ let check (globals, functions, structs) =
               string_of_datatype t2 ^ " in " ^ string_of_expr e))
         )
       | Unop(op, e) as ex -> let t = expr e in
+
+       if compare (string_of_datatype t) "struct" = 0 (*don't compare structs*)
+      then  t
+      else 
 	 (match op with
 	   Neg when t = Datatype(Int) -> Datatype(Int)
    | Neg when t = Datatype(Float) -> Datatype(Float)

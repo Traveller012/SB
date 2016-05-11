@@ -565,7 +565,7 @@ else
 			| _ -> 	raise (Failure "Invalid Types of Struct binop")
 
 		)
-		
+
 		| _ -> raise (Failure "Invalid Types")
 
 	)
@@ -578,28 +578,37 @@ let e' = expr builder e in
 
 	(match e with
 
-		| A.FloatLit f ->
-		L.build_fneg
+		| A.FloatLit f -> L.build_fneg
 
-		| A.Literal i ->
-		L.build_neg
+		| A.Literal i -> L.build_neg
 
 		| A.Id my_id ->
 		(
 			let my_typ = lookup_datatype my_id in
 			(match my_typ with
-				| Datatype(A.Int) ->
-				L.build_neg
-				| Datatype(A.Float) ->
-				L.build_fneg
-				| _ -> raise (Failure "Invalid")
+				| Datatype(A.Int) -> L.build_neg
+				| Datatype(A.Float) -> L.build_fneg
+				| _ -> raise (Failure "Invalid Unop")
 			)
 		)
-		| _ ->  raise (Failure "Invalid")
+		| A.StructAccess(id,field) ->
+		(
+			let my_datatype = lookup_struct_datatype(id,field) in (*get datatype*)
+
+			match my_datatype with
+
+			| Datatype(A.Int) | Datatype(A.Char) -> L.build_neg
+					
+			| Datatype(A.Float) -> L.build_fneg
+
+			| _ -> 	raise (Failure "Invalid Types of Struct binop")
+
+		)
+		| _ ->  raise (Failure "Invalid Unop")
 
 	)
 
-| A.Not     -> L.build_not) e' "tmp" builder
+| A.Not -> L.build_not) e' "tmp" builder
 
 | A.Assign (lhs, rhs) ->
 (
