@@ -2,5 +2,5 @@
   int i;
   bln b;
 
-  b = 48; /* Fail: assigning an integer to a bool */
+  b = 48; (* Fail: assigning an integer to a bool *)
 ]

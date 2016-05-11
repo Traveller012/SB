@@ -9,7 +9,7 @@ bln b;
   c - a;
   a * 3;
   c / 2;
-  d + a; /* Error: bln + int */
+  d + a; (* Error: bln + int *)
 ]
 
 { : int} main = [

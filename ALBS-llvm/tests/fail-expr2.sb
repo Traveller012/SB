@@ -5,7 +5,7 @@ bln b;
 [
   int d;
   bln e;
-  b + a; /* Error: bln + int */
+  b + a; (* Error: bln + int *)
 
 ]
 
