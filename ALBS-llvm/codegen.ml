@@ -81,7 +81,6 @@ let struct_decl_stub sdecl =
 
 	let struct_t = L.named_struct_type context sdecl.A.sname in (*make llvm for this struct type*)
 
-
 	print_endline ";struct_decl_stub called";
 	Hashtbl.add struct_types sdecl.sname struct_t  (* add to map name vs llvm_stuct_type *)
 in
@@ -92,15 +91,12 @@ let struct_decl sdecl =
 
 	let struct_t = Hashtbl.find struct_types sdecl.sname in (*get llvm struct_t code for it*)
 
-
 	let type_list = List.map (fun (t,_) -> ltype_of_typ t) sdecl.A.svar_decl_list in (*map the datatypes*)
 	let name_list = List.map (fun (_,n) -> n) sdecl.A.svar_decl_list in (*map the names*)
 
-	(* Add key all fields in the struct *)
 	let type_list = i32_t :: type_list in
-	let name_list = ".key" :: name_list in
+	let name_list = ".k" :: name_list in
 
-	(* Add key all fields in the struct *)
 	let type_array = (Array.of_list type_list) in
 
 	List.iteri (fun i f ->
