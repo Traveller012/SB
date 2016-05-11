@@ -6,16 +6,21 @@
     int numberOfLines;
     int len;
     int numberOfChars;
-    
 
     numberOfChars = 27;
     i = 0;
     numberOfLines = 0;
     charTotals = new int[numberOfChars];
+    print("before zeroing out\n");
+    print(charTotals);
     zeroOutArray(charTotals, numberOfChars);
+    print("after zeroing out\n");
+    printIntArray(charTotals, numberOfChars);
     countFrequency(charTotals, numberOfChars);
+    printIntArray(charTotals, numberOfChars);
     numberOfLines = highestIntOfArray(charTotals, numberOfChars);
-    printHistogram(charTotals, numberOfChars);
+    printIntArray(charTotals, numberOfChars);
+    printHistogram(charTotals, numberOfChars, numberOfLines);
     rtn 0;
 ]
 
@@ -28,7 +33,7 @@
   }
 ]
 
-{ int[] int : void } printHistogram = countArr sizeOfArray [
+{ int[] int int: void } printHistogram = countArr sizeOfArray maxSize [
 
   int outerCount;
   int innerCount;
@@ -37,7 +42,7 @@
 
   print("Histogram follows:\n");
 
-  outerCount = sizeOfArray;
+  outerCount = maxSize;
   while(outerCount > 0) {
     innerCount = 0;
     while(innerCount < sizeOfArray) {
@@ -52,17 +57,20 @@
     print("\n");
     outerCount = outerCount - 1;
   }
-  print("a b c d e f g h i j k l m n o p q r s t u v w x y z other");
+  print("a b c d e f g h i j k l m n o p q r s t u v w x y z");
 
 ]
 
 { int[] int : void } printIntArray = intArr sizeOfArray [
   int i;
+  int s;
   i = 0;
   while (i < sizeOfArray) {
-    print(intArr[i]);
+    s = intArr[i];
+    print(s);
     i = i + 1;
   }
+  print("\n");
 ]
 
 {int[] int : int } highestIntOfArray = intArr sizeOfArray [
@@ -83,40 +91,33 @@
 ]
 
 {int[] int : void } countFrequency = intArr sizeOfArray [
-    int i;
-    int h;
-    int cAsInt;
-    int charNum;
-    chr c;
-    int temp;
-    int j;
+  int i;
+  int h;
+  int cAsInt;
+  int charNum;
+  chr c;
+  int temp;
+  int j;
 
-    while(c != '\r'){ 
-    
+    while(c != '\r'){
+
         c = getchar();
+        print(c);
 
-        j = addChrToInt(-97,c);
+        j = addChrToInt(c,-97);
 
-        if(j<0){
-            j = 26;
-        }
-
-        if(j>25){
-            j = 26;
-        }
-
-        temp = intArr[j]; (* index of char *)
-        temp = temp + 1; (* increment by 1 *)
-        intArr[j]= temp;
+      temp = intArr[j]; (* index of char *)
+      temp = temp + 1; (* increment by 1 *)
+      intArr[j]= temp;
 
 
         i = i + 1;
     }
 
-    rtn;
+  rtn;
 ]
 
-{int chr : int} addChrToInt = offset c[
+{chr int : int} addChrToInt = c offset [
 
     if (c == 'a' ) {
         offset = offset + 'a';
@@ -197,27 +198,5 @@
         offset = offset + 'z';
    }
 
-
    rtn offset;
  ]
-(*
-i/p: asdfxcghbilyuybrcxwedfbkoiggfffffffaaaawqwqwqreeeeeeeeeeesdcvvkkkkkmmmm\r
-
-o/p: Histogram follows:
-                                                    
-                                                    
-                                                    
-        x                                           
-        x                                           
-        x                                           
-        x x                                         
-        x x                                         
-        x x                                         
-        x x         x                               
-x       x x         x                               
-x       x x         x   x                   x       
-x x x x x x x       x   x       x           x       
-x x x x x x x   x   x   x       x x x     x x x x   
-x x x x x x x x x   x x x   x   x x x   x x x x x   
-a b c d e f g h i j k l m n o p q r s t u v w x y z
-*)
