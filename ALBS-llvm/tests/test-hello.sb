@@ -41,8 +41,9 @@
     int numberOfLines;
     int len;
     int numberOfChars;
+    
 
-    numberOfChars = 10;
+    numberOfChars = 27;
     i = 0;
     numberOfLines = 0;
     charTotals = new int[numberOfChars];
@@ -86,7 +87,7 @@
     print("\n");
     outerCount = outerCount - 1;
   }
-  print("a b c d e f g h i j k l m n o p q r s t u v w x y z");
+  print("a b c d e f g h i j k l m n o p q r s t u v w x y z other");
 
 ]
 
@@ -117,32 +118,40 @@
 ]
 
 {int[] int : void } countFrequency = intArr sizeOfArray [
-  int i;
-  int h;
-  int cAsInt;
-  int charNum;
-  chr c;
-  int temp;
-  int j;
+    int i;
+    int h;
+    int cAsInt;
+    int charNum;
+    chr c;
+    int temp;
+    int j;
 
     while(c != '\r'){ 
     
         c = getchar();
 
-        j = addChrToInt(c,-97);
+        j = addChrToInt(-97,c);
 
-      temp = intArr[j]; (* index of char *)
-      temp = temp + 1; (* increment by 1 *)
-      intArr[j]= temp;
+        if(j<0){
+            j = 26;
+        }
+
+        if(j>25){
+            j = 26;
+        }
+
+        temp = intArr[j]; (* index of char *)
+        temp = temp + 1; (* increment by 1 *)
+        intArr[j]= temp;
 
 
         i = i + 1;
     }
 
-  rtn;
+    rtn;
 ]
 
-{chr int : int} addChrToInt = c offset [
+{int chr : int} addChrToInt = offset c[
 
     if (c == 'a' ) {
         offset = offset + 'a';
@@ -223,22 +232,27 @@
         offset = offset + 'z';
    }
 
+
    rtn offset;
  ]
 (*
-i/p:  sdfgyhfjasdxngeusrhaaaaa\r
+i/p: asdfxcghbilyuybrcxwedfbkoiggfffffffaaaawqwqwqreeeeeeeeeeesdcvvkkkkkmmmm\r
 
-o/p:
-Histogram follows:
-                    
-                    
-                    
-                    
-x                   
-x                   
-x                   
-x                   
-x     x   x x x     
-x     x x x x x   x 
+o/p: Histogram follows:
+                                                    
+                                                    
+                                                    
+        x                                           
+        x                                           
+        x                                           
+        x x                                         
+        x x                                         
+        x x                                         
+        x x         x                               
+x       x x         x                               
+x       x x         x   x                   x       
+x x x x x x x       x   x       x           x       
+x x x x x x x   x   x   x       x x x     x x x x   
+x x x x x x x x x   x x x   x   x x x   x x x x x   
 a b c d e f g h i j k l m n o p q r s t u v w x y z
 *)
