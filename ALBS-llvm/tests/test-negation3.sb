@@ -1,0 +1,7 @@
+{ : int} main = [
+ float x;
+ x = -10.0;
+ x = 0.0 + -x;
+ print(x);
+ rtn 0;
+]

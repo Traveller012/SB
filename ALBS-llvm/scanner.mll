@@ -15,7 +15,7 @@ let string = '"' ( (ascii | escaped_char)* as s) '"'
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "/*"     { comment lexbuf }           (* Comments *)
+| "(*"     { comment lexbuf }           (* Comments *)
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -61,5 +61,5 @@ rule token = parse
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 | string    { STRING_LITERAL(unescape s) }
 and comment = parse
-  "*/" { token lexbuf }
+  "*)" { token lexbuf }
 | _    { comment lexbuf }
