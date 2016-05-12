@@ -1,47 +1,26 @@
-
-{ : int} main = [ 
-
-    
+{ : int} main = [     
     struct complex c1;
     struct complex c2;
     struct complex c3;
 
     c1.real = 1.0;
     c1.imag = -1.0;
-    c1.name = 'a';
-
     c2.real = 41.0;
     c2.imag = 1.0;
-    c2.name = 'b';
-
-    c3.name = 'c';
+ 
     c3.real = c1.real + c2.real;
     c3.imag = c1.imag + c2.imag;
 
-    print("\n\n\n\nname:\n");
-    print(c3.name);
-
-    print("real:\n");
+    print("\n real: \n");
     print(c3.real);
-    print("imaginary:\n");
+    print("\n imaginary: \n");
     print(c3.imag);
-
-
-    print("\n\n\n\n\n");
-    
-    
-
+ 
     rtn 0;
 ]
-
-struct complex[
-    
+struct complex[   
     flt real;
     flt imag;
-
     int x;
-    int y;
-
     chr name;
-
 ]
